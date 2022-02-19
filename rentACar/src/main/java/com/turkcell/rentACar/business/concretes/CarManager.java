@@ -73,7 +73,7 @@ public class CarManager implements CarService {
 
 	@Override
 	public DataResult<List<CarListDto>> getByDailyPrice(double dailyPrice) {
-		List<Car> result = this.carDao.getByDailyPrice(dailyPrice);
+		List<Car> result = this.carDao.findByDailyPriceLessThanEqual(dailyPrice);
 		List<CarListDto> response = result.stream()
 				.map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 		return new SuccessDataResult<List<CarListDto>>(response, "Cars with daily price listed successfully.");
