@@ -2,6 +2,8 @@ package com.turkcell.rentACar.api.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +38,7 @@ public class BrandsController {
 	}
 
 	@PostMapping("/add")
-	public Result add(@RequestBody CreateBrandRequest createBrandRequest) throws Exception {
+	public Result add(@RequestBody @Valid CreateBrandRequest createBrandRequest){
 		return this.brandService.add(createBrandRequest);
 	}
 
@@ -51,7 +53,7 @@ public class BrandsController {
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody UpdateBrandRequest updateBrandRequest) throws Exception {
+	public Result update(@RequestBody @Valid UpdateBrandRequest updateBrandRequest){
 		return this.brandService.update(updateBrandRequest);
 	}
 

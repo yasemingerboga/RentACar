@@ -2,6 +2,8 @@ package com.turkcell.rentACar.api.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +28,6 @@ public class CarsController {
 	private CarService carService;
 
 	public CarsController(CarService carService) {
-		super();
 		this.carService = carService;
 	}
 
@@ -36,7 +37,7 @@ public class CarsController {
 	}
 
 	@PostMapping("/add")
-	public Result add(@RequestBody CreateCarRequest createCarRequest) {
+	public Result add(@RequestBody @Valid CreateCarRequest createCarRequest) {
 		return carService.add(createCarRequest);
 	}
 
@@ -51,12 +52,12 @@ public class CarsController {
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody UpdateCarRequest updateCarRequest) {
+	public Result update(@RequestBody @Valid UpdateCarRequest updateCarRequest) {
 		return this.carService.update(updateCarRequest);
 	}
 
-	@GetMapping("/get/{dailyPrice}")
-	public DataResult<List<CarListDto>> getByDailyPrice(double dailyPrice) {
+	@GetMapping("/getByDailyPrice/{dailyPrice}")
+	public DataResult<List<CarListDto>> getByDailyPrice(@RequestParam double dailyPrice) {
 		return this.carService.getByDailyPrice(dailyPrice);
 	}
 	

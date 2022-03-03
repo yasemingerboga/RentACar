@@ -18,6 +18,7 @@ import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
 import com.turkcell.rentACar.dataAccess.abstracts.BrandDao;
 import com.turkcell.rentACar.entities.concretes.Brand;
+import com.turkcell.rentACar.exceptions.concretes.BusinessException;
 
 @Service
 public class BrandManager implements BrandService {
@@ -43,7 +44,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public Result add(CreateBrandRequest createBrandRequest) throws Exception {
+	public Result add(CreateBrandRequest createBrandRequest){
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 		checkIfBrandExists(createBrandRequest.getName());
 		this.brandDao.save(brand);
@@ -58,18 +59,18 @@ public class BrandManager implements BrandService {
 		return new SuccessDataResult<GetBrandDto>(response,"Getting brand by id");
 	}
 
-	private void checkIfBrandExists(String name) throws Exception {
+	private void checkIfBrandExists(String name) {
 		if (this.brandDao.existsByBrandName(name)) {
-			throw new Exception("Aynı isimde marka eklenemez");
+			throw new BusinessException("Aynı isimde marka eklenemez");
 		}
 	}
 
-	private void checkIfBrandNameExists(Brand brand) throws Exception {
+	private void checkIfBrandNameExists(Brand brand) {
 
 		Brand ifExsistsBrand = this.brandDao.findByBrandName(brand.getBrandName());
 
 		if (ifExsistsBrand != null && ifExsistsBrand.getBrandId() != brand.getBrandId()) {
-			throw new Exception("Aynı isimde marka eklenemez");
+			throw new BusinessException("Aynı isimde marka eklenemez");
 		}
 	}
 
@@ -81,7 +82,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public Result update(UpdateBrandRequest updateBrandRequest) throws Exception {
+	public Result update(UpdateBrandRequest updateBrandRequest) {
 		Brand brand = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 		checkIfBrandNameExists(brand);
 		this.brandDao.save(brand);

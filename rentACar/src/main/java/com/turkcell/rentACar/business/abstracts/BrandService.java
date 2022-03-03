@@ -12,8 +12,8 @@ import com.turkcell.rentACar.core.utilities.results.Result;
 public interface BrandService {
 
 	DataResult<List<BrandListDto>> getAll();
-	Result add(CreateBrandRequest createBrandRequest) throws Exception;
+	Result add(CreateBrandRequest createBrandRequest);
 	DataResult<GetBrandDto> getById(int id);
 	Result delete(int id);
-	Result update(UpdateBrandRequest updateBrandRequest) throws Exception;
+	Result update(UpdateBrandRequest updateBrandRequest);
 }

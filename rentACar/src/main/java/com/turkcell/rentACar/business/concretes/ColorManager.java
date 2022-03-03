@@ -18,6 +18,7 @@ import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
 import com.turkcell.rentACar.dataAccess.abstracts.ColorDao;
 import com.turkcell.rentACar.entities.concretes.Color;
+import com.turkcell.rentACar.exceptions.concretes.BusinessException;
 
 @Service
 public class ColorManager implements ColorService {
@@ -43,7 +44,7 @@ public class ColorManager implements ColorService {
 	}
 
 	@Override
-	public Result add(CreateColorRequest createColorRequest) throws Exception {
+	public Result add(CreateColorRequest createColorRequest){
 		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
 		checkIfColorExists(createColorRequest.getName());
 		this.colorDao.save(color);
@@ -58,18 +59,18 @@ public class ColorManager implements ColorService {
 		return new SuccessDataResult<GetColorDto>(response, "Getting color by id");
 	}
 
-	private void checkIfColorExists(String name) throws Exception {
+	private void checkIfColorExists(String name){
 		if (this.colorDao.existsByColorName(name)) {
-			throw new Exception("Aynı isimde renk eklenemez");
+			throw new BusinessException("Aynı isimde renk eklenemez");
 		}
 	}
 
-	private void checkIfColorNameExists(Color color) throws Exception {
+	private void checkIfColorNameExists(Color color){
 
 		Color ifExsistsColor = this.colorDao.findByColorName(color.getColorName());
 
 		if (ifExsistsColor != null && ifExsistsColor.getColorId() != color.getColorId()) {
-			throw new Exception("Aynı isimde renk eklenemez");
+			throw new BusinessException("Aynı isimde renk eklenemez");
 		}
 	}
 
@@ -81,7 +82,7 @@ public class ColorManager implements ColorService {
 	}
 
 	@Override
-	public Result update(UpdateColorRequest updateColorRequest) throws Exception {
+	public Result update(UpdateColorRequest updateColorRequest){
 		Color color = this.modelMapperService.forRequest().map(updateColorRequest, Color.class);
 		checkIfColorNameExists(color);
 		this.colorDao.save(color);

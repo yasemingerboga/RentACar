@@ -2,6 +2,8 @@ package com.turkcell.rentACar.api.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +38,7 @@ public class ColorsController {
 	}
 
 	@PostMapping("/add")
-	public Result add(@RequestBody CreateColorRequest createColorRequest) throws Exception {
+	public Result add(@RequestBody @Valid CreateColorRequest createColorRequest){
 		return this.colorService.add(createColorRequest);
 	}
 
@@ -51,7 +53,7 @@ public class ColorsController {
 	}
 
 	@PutMapping("/update")
-	public Result update(@RequestBody UpdateColorRequest updateColorRequest) throws Exception {
+	public Result update(@RequestBody @Valid UpdateColorRequest updateColorRequest){
 		return this.colorService.update(updateColorRequest);
 	}
 
