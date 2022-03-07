@@ -69,7 +69,7 @@ public class BrandManager implements BrandService {
 
 		Brand ifExsistsBrand = this.brandDao.findByBrandName(brand.getBrandName());
 
-		if (ifExsistsBrand != null && ifExsistsBrand.getBrandId() != brand.getBrandId()) {
+		if (ifExsistsBrand != null && ifExsistsBrand.getId() != brand.getId()) {
 			throw new BusinessException("Aynı isimde marka eklenemez");
 		}
 	}
