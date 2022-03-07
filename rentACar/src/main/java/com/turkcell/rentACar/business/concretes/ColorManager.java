@@ -69,7 +69,7 @@ public class ColorManager implements ColorService {
 
 		Color ifExsistsColor = this.colorDao.findByColorName(color.getColorName());
 
-		if (ifExsistsColor != null && ifExsistsColor.getColorId() != color.getColorId()) {
+		if (ifExsistsColor != null && ifExsistsColor.getId() != color.getId()) {
 			throw new BusinessException("Aynı isimde renk eklenemez");
 		}
 	}

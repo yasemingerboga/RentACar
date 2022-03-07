@@ -16,4 +16,6 @@ public class GetCarMaintenanceDto {
 	
 	private Date returnDate;
 	
+	private int carId;
+	
 }
