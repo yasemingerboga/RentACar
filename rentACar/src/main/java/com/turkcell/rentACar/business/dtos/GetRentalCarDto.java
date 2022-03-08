@@ -9,13 +9,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CarMaintenanceListDto {
-	private int carMaintenanceId;
-	
-	private String description;
-	
-	private LocalDate returnDate;
-	
+public class GetRentalCarDto {
+	private int rentalId;
+
+	private LocalDate startingDate;
+
+	private LocalDate endDate;
+
 	private int carId;
-	
 }
