@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import com.turkcell.rentACar.business.abstracts.CarService;
 import com.turkcell.rentACar.business.dtos.CarListDto;
 import com.turkcell.rentACar.business.dtos.GetCarDto;
+import com.turkcell.rentACar.business.dtos.RentalCarListDto;
 import com.turkcell.rentACar.business.requests.CreateCarRequest;
 import com.turkcell.rentACar.business.requests.UpdateCarRequest;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
+import com.turkcell.rentACar.core.utilities.results.ErrorDataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -54,6 +56,9 @@ public class CarManager implements CarService {
 	@Override
 	public DataResult<GetCarDto> getById(int id) {
 		Car car = this.carDao.findById(id);
+		if (car==null) {
+			return new ErrorDataResult<GetCarDto>("Cannot getting car by id.");
+		}
 		GetCarDto response = this.modelMapperService.forDto().map(car, GetCarDto.class);
 		return new SuccessDataResult<GetCarDto>(response, "Getting car by id");
 	}

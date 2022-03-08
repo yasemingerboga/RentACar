@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,24 +15,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="car_maintenances")
-public class CarMaintenance {
-		@Id
-		@GeneratedValue(strategy = GenerationType.IDENTITY)
-		@Column(name="car_maintenance_id")
-		private int id;
-		
-		@Column(name="description")
-		private String description;
-		
-		@Column(name = "return_date")
-		private LocalDate returnDate;
-		
-		@ManyToOne(fetch = FetchType.EAGER)
-		@JoinColumn(name="car_id")
-		private Car car;
+@Table(name = "rental_cars")
+public class RentalCar {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "rental_car_id")
+	private int id;
+
+	@Column(name = "starting_date")
+	private LocalDate startingDate;
+
+	@Column(name = "end_date")
+	private LocalDate endDate;
+
+	@ManyToOne
+	@JoinColumn(name = "car_id")
+	private Car car;
 }

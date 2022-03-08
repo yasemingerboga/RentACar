@@ -2,8 +2,7 @@ package com.turkcell.rentACar.business.requests;
 
 import java.time.LocalDate;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,11 +11,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCarMaintenanceRequest {
-	private String description;
-	@NotNull
-	private LocalDate returnDate;
-	@NotNull
-	@Min(1)
+public class CreateRentalCarRequest {
+	private LocalDate startingDate;
+
+	private LocalDate endDate;
+
+	@Positive
 	private int carId;
 }
