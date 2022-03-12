@@ -53,6 +53,40 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	@Override
+	public DataResult<List<RentalCarListDto>> getAll() {
+
+		List<RentalCar> resultList = this.rentalCarDao.findAll();
+
+		List<RentalCarListDto> responseList = resultList.stream()
+				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<RentalCarListDto>>(responseList, "Rental cars listed successfully.");
+	}
+
+	@Override
+	public DataResult<GetRentalCarDto> getById(int id) {
+
+		RentalCar result = this.rentalCarDao.getById(id);
+
+		GetRentalCarDto response = this.modelMapperService.forDto().map(result, GetRentalCarDto.class);
+
+		return new SuccessDataResult<GetRentalCarDto>(response, "Rental car has been received successfully.");
+	}
+
+	@Override
+	public DataResult<List<RentalCarListDto>> getByCarId(int carId) {
+
+		List<RentalCar> result = this.rentalCarDao.getByCar_Id(carId);
+
+		List<RentalCarListDto> response = result.stream()
+				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<RentalCarListDto>>(response, "Rental cars listed successfully.");
+	}
+
+	@Override
 	public Result add(CreateRentalModel rentalModel) {
 
 		checkIfCarExist(rentalModel.getCreateRentalCarRequest().getCarId());
@@ -63,18 +97,8 @@ public class RentalCarManager implements RentalCarService {
 				.getCreateOrderedAdditionalServiceRequest().stream().map(additionalService -> this.modelMapperService
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
-		List<GetAdditionalServiceDto> getAdditionalServiceDtos = new ArrayList<>();
-		additionalServices.forEach(a -> {
-			getAdditionalServiceDtos.add(additionalProductService.getById(a.getAdditionalService().getId()).getData());
-		});
 
-		List<AdditionalService> additionalServices2 = getAdditionalServiceDtos.stream()
-				.map(additionalService -> this.modelMapperService.forRequest().map(additionalService,
-						AdditionalService.class))
-				.collect(Collectors.toList());
-		for (int i = 0; i < additionalServices.size(); i++) {
-			additionalServices.get(i).setAdditionalService(additionalServices2.get(i));
-		}
+		additionalServices.equals(mappingOrderedAdditionalService(additionalServices));
 		rentalCar.setOrderedAdditionalServices(additionalServices);
 
 		checkIfInMaintenance(rentalCar);
@@ -85,6 +109,26 @@ public class RentalCarManager implements RentalCarService {
 		this.rentalCarDao.save(rentalCar);
 
 		return new SuccessResult("Rental car saved successfully.");
+	}
+
+	private List<OrderedAdditionalService> mappingOrderedAdditionalService(
+			List<OrderedAdditionalService> orderedAdditionalServices) {
+
+		List<GetAdditionalServiceDto> getAdditionalServiceDtos = new ArrayList<>();
+
+		orderedAdditionalServices.forEach(orderedAdditionalService -> {
+			getAdditionalServiceDtos.add(additionalProductService
+					.getById(orderedAdditionalService.getAdditionalService().getId()).getData());
+		});
+
+		List<AdditionalService> additionalServices = getAdditionalServiceDtos.stream()
+				.map(additionalService -> this.modelMapperService.forRequest().map(additionalService,
+						AdditionalService.class))
+				.collect(Collectors.toList());
+		for (int i = 0; i < orderedAdditionalServices.size(); i++) {
+			orderedAdditionalServices.get(i).setAdditionalService(additionalServices.get(i));
+		}
+		return orderedAdditionalServices;
 	}
 
 	private RentalCar checkIfAdditionalPrice(RentalCar rentalCar) {
@@ -131,64 +175,20 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	@Override
-	public DataResult<GetRentalCarDto> getById(int id) {
-
-		RentalCar result = this.rentalCarDao.getById(id);
-
-		GetRentalCarDto response = this.modelMapperService.forDto().map(result, GetRentalCarDto.class);
-
-		return new SuccessDataResult<GetRentalCarDto>(response, "Rental car has been received successfully.");
-	}
-
-	@Override
-	public DataResult<List<RentalCarListDto>> getAll() {
-
-		List<RentalCar> resultList = this.rentalCarDao.findAll();
-
-		List<RentalCarListDto> responseList = resultList.stream()
-				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
-				.collect(Collectors.toList());
-
-		return new SuccessDataResult<List<RentalCarListDto>>(responseList, "Rental cars listed successfully.");
-	}
-
-	@Override
-	public DataResult<List<RentalCarListDto>> getByCarId(int carId) {
-
-		List<RentalCar> result = this.rentalCarDao.getByCar_Id(carId);
-
-		List<RentalCarListDto> response = result.stream()
-				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
-				.collect(Collectors.toList());
-
-		return new SuccessDataResult<List<RentalCarListDto>>(response, "Rental cars listed successfully.");
-	}
-
-	@Override
 	public Result update(UpdateRentalModel updateRentalModel) {
-		RentalCar rentalCar = rentalCarDao.getById(updateRentalModel.getUpdateRentalCarRequest().getId());
 		orderedAdditionalProductService.deleteByRentalCarId(updateRentalModel.getUpdateRentalCarRequest().getId());
 
 		RentalCar updaterentalCar = this.modelMapperService.forRequest()
 				.map(updateRentalModel.getUpdateRentalCarRequest(), RentalCar.class);
-		List<OrderedAdditionalService> additionalServices = updateRentalModel
+
+		List<OrderedAdditionalService> orderedAdditionalServices = updateRentalModel
 				.getOrderedAdditionalServiceRequests().stream().map(additionalService -> this.modelMapperService
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
-		
-		List<GetAdditionalServiceDto> getAdditionalServiceDtos = new ArrayList<>();
-		additionalServices.forEach(a -> {
-			getAdditionalServiceDtos.add(additionalProductService.getById(a.getAdditionalService().getId()).getData());
-		});
 
-		List<AdditionalService> additionalServices2 = getAdditionalServiceDtos.stream()
-				.map(additionalService -> this.modelMapperService.forRequest().map(additionalService,
-						AdditionalService.class))
-				.collect(Collectors.toList());
-		for (int i = 0; i < additionalServices.size(); i++) {
-			additionalServices.get(i).setAdditionalService(additionalServices2.get(i));
-		}
-		updaterentalCar.setOrderedAdditionalServices(additionalServices);
+		orderedAdditionalServices.equals(mappingOrderedAdditionalService(orderedAdditionalServices));
+
+		updaterentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
 		updaterentalCar.equals(checkIfOrderedAdditionalServicesExistsInUpdate(updaterentalCar));
 
 		this.rentalCarDao.save(updaterentalCar);
