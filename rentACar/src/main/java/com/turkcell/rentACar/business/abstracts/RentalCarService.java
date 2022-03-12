@@ -2,31 +2,24 @@ package com.turkcell.rentACar.business.abstracts;
 
 import java.util.List;
 
-import org.springframework.data.domain.Sort;
-
-import com.turkcell.rentACar.business.dtos.GetRentalCarDto;
-import com.turkcell.rentACar.business.dtos.RentalCarListDto;
-import com.turkcell.rentACar.business.requests.CreateRentalCarRequest;
-import com.turkcell.rentACar.business.requests.UpdateRentalCarRequest;
+import com.turkcell.rentACar.api.controllers.models.CreateRentalModel;
+import com.turkcell.rentACar.api.controllers.models.UpdateRentalModel;
+import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
+import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
-import com.turkcell.rentACar.exceptions.concretes.BusinessException;
 
 public interface RentalCarService {
 
-	Result add(CreateRentalCarRequest createRentalCarRequest);
+	Result add(CreateRentalModel rentalModel);
 
-	DataResult<GetRentalCarDto> getByRentalId(int rentalId);
+	DataResult<GetRentalCarDto> getById(int id);
 
 	DataResult<List<RentalCarListDto>> getAll();
 
-	DataResult<List<RentalCarListDto>> getAllPaged(int pageNo, int pageSize);
+	DataResult<List<RentalCarListDto>> getByCarId(int carId);
 
-	DataResult<List<RentalCarListDto>> getAllSorted(Sort.Direction direction);
-
-	List<RentalCarListDto> getByCarId(int carId);
-
-	Result update(int rentalId, UpdateRentalCarRequest updateRentalCarRequest);
+	Result update(UpdateRentalModel updateRentalModel);
 
 	Result delete(int id);
 
