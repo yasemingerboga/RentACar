@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.turkcell.rentACar.business.abstracts.AdditionalProductService;
+import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.dtos.AdditionalService.AdditionalServiceListDto;
 import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
 import com.turkcell.rentACar.business.requests.AdditionalService.CreateAdditionalServiceRequest;
@@ -20,13 +20,13 @@ import com.turkcell.rentACar.dataAccess.abstracts.AdditionalServiceDao;
 import com.turkcell.rentACar.entities.concretes.AdditionalService;
 
 @Service
-public class AdditionalProductManager implements AdditionalProductService {
+public class AdditionalServiceManager implements AdditionalServiceService {
 
 	private AdditionalServiceDao additionalProductDao;
 	private ModelMapperService modelMapperService;
 
 	@Autowired
-	public AdditionalProductManager(AdditionalServiceDao additionalProductDao, ModelMapperService modelMapperService) {
+	public AdditionalServiceManager(AdditionalServiceDao additionalProductDao, ModelMapperService modelMapperService) {
 		super();
 		this.additionalProductDao = additionalProductDao;
 		this.modelMapperService = modelMapperService;

@@ -9,7 +9,7 @@ import com.turkcell.rentACar.business.requests.AdditionalService.UpdateAdditiona
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 
-public interface AdditionalProductService {
+public interface AdditionalServiceService {
 	DataResult<List<AdditionalServiceListDto>> getAll();
 
 	Result add(CreateAdditionalServiceRequest createAdditionalServiceRequest);

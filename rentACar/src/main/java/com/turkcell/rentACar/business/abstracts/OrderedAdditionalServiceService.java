@@ -6,7 +6,7 @@ import com.turkcell.rentACar.business.dtos.OrderedAdditionalService.GetOrderedAd
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 
-public interface OrderedAdditionalProductService {
+public interface OrderedAdditionalServiceService {
 	DataResult<List<GetOrderedAdditionalServiceDto>> getAllByRentalCarId(int id);
 
 	Result delete(int id);

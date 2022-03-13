@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.turkcell.rentACar.business.abstracts.AdditionalProductService;
+import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.dtos.AdditionalService.AdditionalServiceListDto;
 import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
 import com.turkcell.rentACar.business.requests.AdditionalService.CreateAdditionalServiceRequest;
@@ -18,12 +18,12 @@ import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 
 @RestController
-@RequestMapping("/api/additionalProducts")
-public class AdditionalProductsController {
-	private AdditionalProductService additionalProductService;
+@RequestMapping("/api/additionalServices")
+public class AdditionalServicesController {
+	private AdditionalServiceService additionalProductService;
 
 	@Autowired
-	public AdditionalProductsController(AdditionalProductService additionalProductService) {
+	public AdditionalServicesController(AdditionalServiceService additionalProductService) {
 		super();
 		this.additionalProductService = additionalProductService;
 	}

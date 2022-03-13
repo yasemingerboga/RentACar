@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.turkcell.rentACar.business.abstracts.OrderedAdditionalProductService;
+import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.dtos.OrderedAdditionalService.GetOrderedAdditionalServiceDto;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
@@ -16,11 +16,11 @@ import com.turkcell.rentACar.dataAccess.abstracts.OrderedAdditionalServiceDao;
 import com.turkcell.rentACar.entities.concretes.OrderedAdditionalService;
 
 @Service
-public class OrderedAdditionalProductManager implements OrderedAdditionalProductService {
+public class OrderedAdditionalServiceManager implements OrderedAdditionalServiceService {
 	private OrderedAdditionalServiceDao orderedAdditionalServiceDao;
 	private ModelMapperService modelMapperService;
 
-	public OrderedAdditionalProductManager(OrderedAdditionalServiceDao orderedAdditionalServiceDao,
+	public OrderedAdditionalServiceManager(OrderedAdditionalServiceDao orderedAdditionalServiceDao,
 			ModelMapperService modelMapperService) {
 		super();
 		this.orderedAdditionalServiceDao = orderedAdditionalServiceDao;

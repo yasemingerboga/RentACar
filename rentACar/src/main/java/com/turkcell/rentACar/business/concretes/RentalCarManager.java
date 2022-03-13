@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACar.api.controllers.models.CreateRentalModel;
 import com.turkcell.rentACar.api.controllers.models.UpdateRentalModel;
-import com.turkcell.rentACar.business.abstracts.AdditionalProductService;
+import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACar.business.abstracts.CarService;
-import com.turkcell.rentACar.business.abstracts.OrderedAdditionalProductService;
+import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
 import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
 import com.turkcell.rentACar.business.dtos.CarMaintenance.CarMaintenanceListDto;
@@ -36,14 +36,14 @@ public class RentalCarManager implements RentalCarService {
 	private ModelMapperService modelMapperService;
 	private CarMaintenanceService carMaintenanceService;
 	private CarService carService;
-	private OrderedAdditionalProductService orderedAdditionalProductService;
-	private AdditionalProductService additionalProductService;
+	private OrderedAdditionalServiceService orderedAdditionalProductService;
+	private AdditionalServiceService additionalProductService;
 
 	@Autowired
 	public RentalCarManager(RentalCarDao rentalCarDao, ModelMapperService modelMapperService,
 			CarMaintenanceService carMaintenanceService, CarService carService,
-			OrderedAdditionalProductService orderedAdditionalProductService,
-			AdditionalProductService additionalProductService) {
+			OrderedAdditionalServiceService orderedAdditionalProductService,
+			AdditionalServiceService additionalProductService) {
 		this.rentalCarDao = rentalCarDao;
 		this.modelMapperService = modelMapperService;
 		this.carMaintenanceService = carMaintenanceService;
