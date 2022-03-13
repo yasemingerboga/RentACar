@@ -55,7 +55,7 @@ public class CarManager implements CarService {
 	@Override
 	public DataResult<GetCarDto> getById(int id) {
 		Car car = this.carDao.findById(id);
-		if (car==null) {
+		if (car == null) {
 			return new ErrorDataResult<GetCarDto>("Cannot getting car by id.");
 		}
 		GetCarDto response = this.modelMapperService.forDto().map(car, GetCarDto.class);
@@ -71,6 +71,7 @@ public class CarManager implements CarService {
 	@Override
 	public Result update(UpdateCarRequest updateCarRequest) {
 		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
+		car.setId(updateCarRequest.getCarId());
 		carDao.save(car);
 		return new SuccessResult("Car updated successfully.");
 	}

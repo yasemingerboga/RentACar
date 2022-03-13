@@ -44,7 +44,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public Result add(CreateBrandRequest createBrandRequest){
+	public Result add(CreateBrandRequest createBrandRequest) {
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 		checkIfBrandExists(createBrandRequest.getName());
 		this.brandDao.save(brand);
@@ -56,12 +56,12 @@ public class BrandManager implements BrandService {
 	public DataResult<GetBrandDto> getById(int id) {
 		Brand brand = brandDao.findById(id);
 		GetBrandDto response = this.modelMapperService.forDto().map(brand, GetBrandDto.class);
-		return new SuccessDataResult<GetBrandDto>(response,"Getting brand by id");
+		return new SuccessDataResult<GetBrandDto>(response, "Getting brand by id");
 	}
 
 	private void checkIfBrandExists(String name) {
 		if (this.brandDao.existsByBrandName(name)) {
-			throw new BusinessException("Aynı isimde marka eklenemez");
+			throw new BusinessException("Brands with the same name cannot be added.");
 		}
 	}
 
@@ -70,7 +70,7 @@ public class BrandManager implements BrandService {
 		Brand ifExsistsBrand = this.brandDao.findByBrandName(brand.getBrandName());
 
 		if (ifExsistsBrand != null && ifExsistsBrand.getId() != brand.getId()) {
-			throw new BusinessException("Aynı isimde marka eklenemez");
+			throw new BusinessException("Brands with the same name cannot be added..");
 		}
 	}
 

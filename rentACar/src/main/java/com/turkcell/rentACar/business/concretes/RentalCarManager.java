@@ -93,15 +93,18 @@ public class RentalCarManager implements RentalCarService {
 
 		RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalModel.getCreateRentalCarRequest(),
 				RentalCar.class);
+
 		List<OrderedAdditionalService> additionalServices = rentalModel
 				.getCreateOrderedAdditionalServiceRequest().stream().map(additionalService -> this.modelMapperService
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
 
 		additionalServices.equals(mappingOrderedAdditionalService(additionalServices));
+		rentalCar.setId(0);
 		rentalCar.setOrderedAdditionalServices(additionalServices);
 
 		checkIfInMaintenance(rentalCar);
+		checkIfInRent(rentalCar);
 
 		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
 		rentalCar.equals(checkIfOrderedAdditionalServicesExists(rentalCar));
@@ -174,12 +177,34 @@ public class RentalCarManager implements RentalCarService {
 		}
 	}
 
+	private void checkIfInRent(RentalCar rentalCar) {
+
+		List<RentalCar> rentalCarList = this.rentalCarDao.getByCar_Id(rentalCar.getCar().getId());
+
+		if (rentalCarList == null) {
+			return;
+		}
+		for (RentalCar rental : rentalCarList) {
+			if (rentalCar.getId() != rental.getId()) {
+				if (rentalCar.getStartingDate().isBefore(rental.getEndDate())
+						|| rentalCar.getStartingDate().isAfter(rental.getStartingDate())) {
+					throw new BusinessException("This car is rented already.");
+				}
+			}
+
+		}
+
+	}
+
 	@Override
 	public Result update(UpdateRentalModel updateRentalModel) {
 		orderedAdditionalProductService.deleteByRentalCarId(updateRentalModel.getUpdateRentalCarRequest().getId());
 
-		RentalCar updaterentalCar = this.modelMapperService.forRequest()
+		RentalCar updatedRentalCar = this.modelMapperService.forRequest()
 				.map(updateRentalModel.getUpdateRentalCarRequest(), RentalCar.class);
+
+		checkIfInMaintenance(updatedRentalCar);
+		checkIfInRent(updatedRentalCar);
 
 		List<OrderedAdditionalService> orderedAdditionalServices = updateRentalModel
 				.getOrderedAdditionalServiceRequests().stream().map(additionalService -> this.modelMapperService
@@ -188,10 +213,12 @@ public class RentalCarManager implements RentalCarService {
 
 		orderedAdditionalServices.equals(mappingOrderedAdditionalService(orderedAdditionalServices));
 
-		updaterentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
-		updaterentalCar.equals(checkIfOrderedAdditionalServicesExistsInUpdate(updaterentalCar));
+		updatedRentalCar.equals(checkIfAdditionalPrice(updatedRentalCar));
 
-		this.rentalCarDao.save(updaterentalCar);
+		updatedRentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
+		updatedRentalCar.equals(checkIfOrderedAdditionalServicesExistsInUpdate(updatedRentalCar));
+
+		this.rentalCarDao.save(updatedRentalCar);
 
 		return new SuccessResult("Rental car is updated.");
 	}
