@@ -60,7 +60,7 @@ public class ColorManager implements ColorService {
 
 	private void checkIfColorExists(String name) {
 		if (this.colorDao.existsByColorName(name)) {
-			throw new BusinessException("Aynı isimde renk eklenemez");
+			throw new BusinessException("Colors with the same name cannot be added.");
 		}
 	}
 
@@ -69,7 +69,7 @@ public class ColorManager implements ColorService {
 		Color ifExsistsColor = this.colorDao.findByColorName(color.getColorName());
 
 		if (ifExsistsColor != null && ifExsistsColor.getId() != color.getId()) {
-			throw new BusinessException("Aynı isimde renk eklenemez");
+			throw new BusinessException("Colors with the same name cannot be added.");
 		}
 	}
 
