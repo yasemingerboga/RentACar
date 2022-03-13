@@ -215,23 +215,13 @@ public class RentalCarManager implements RentalCarService {
 		updatedRentalCar.equals(checkIfAdditionalPrice(updatedRentalCar));
 
 		updatedRentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
-		updatedRentalCar.equals(checkIfOrderedAdditionalServicesExistsInUpdate(updatedRentalCar));
+		updatedRentalCar.equals(checkIfOrderedAdditionalServicesExists(updatedRentalCar));
 
 		this.rentalCarDao.save(updatedRentalCar);
 
 		return new SuccessResult("Rental car is updated.");
 	}
-
-	private RentalCar checkIfOrderedAdditionalServicesExistsInUpdate(RentalCar rentalCar) {
-		rentalCar.getOrderedAdditionalServices().forEach(orderedAdditionalService -> {
-			rentalCar.setAdditionalPrice(
-					rentalCar.getAdditionalPrice() + orderedAdditionalService.getAdditionalService().getPrice());
-			orderedAdditionalService.setRentalCar(rentalCar);
-		});
-
-		return rentalCar;
-	}
-
+	
 	public boolean checkIfCarExist(int carId) {
 
 		if (this.carService.getById(carId) == null) {
