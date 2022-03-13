@@ -94,17 +94,16 @@ public class RentalCarManager implements RentalCarService {
 		RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalModel.getCreateRentalCarRequest(),
 				RentalCar.class);
 
+		checkIfInMaintenance(rentalCar);
+		checkIfInRent(rentalCar);
+
 		List<OrderedAdditionalService> additionalServices = rentalModel
 				.getCreateOrderedAdditionalServiceRequest().stream().map(additionalService -> this.modelMapperService
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
 
 		additionalServices.equals(mappingOrderedAdditionalService(additionalServices));
-		rentalCar.setId(0);
 		rentalCar.setOrderedAdditionalServices(additionalServices);
-
-		checkIfInMaintenance(rentalCar);
-		checkIfInRent(rentalCar);
 
 		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
 		rentalCar.equals(checkIfOrderedAdditionalServicesExists(rentalCar));
@@ -187,7 +186,7 @@ public class RentalCarManager implements RentalCarService {
 		for (RentalCar rental : rentalCarList) {
 			if (rentalCar.getId() != rental.getId()) {
 				if (rentalCar.getStartingDate().isBefore(rental.getEndDate())
-						|| rentalCar.getStartingDate().isAfter(rental.getStartingDate())) {
+						&& rentalCar.getStartingDate().isAfter(rental.getStartingDate())) {
 					throw new BusinessException("This car is rented already.");
 				}
 			}
