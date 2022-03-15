@@ -12,13 +12,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateRentalCarRequest {
+
 	private LocalDate startingDate;
+
 	private LocalDate endDate;
+
 	@Positive
 	private int carId;
+
 	@Positive
 	private int rentedCityId;
+
 	@Positive
 	private int dropOffCityId;
-//	private List<OrderedAdditionalService> orderedAdditionalServices;
+
+	@Positive
+	private int customerUserId;
 }

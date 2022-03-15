@@ -19,4 +19,6 @@ public interface IndividualCustomerService {
 	DataResult<GetIndividualCustomerDto> getById(int id);
 
 	DataResult<List<IndividualCustomerListDto>> getAll();
+
+	Result existById(int id);
 }

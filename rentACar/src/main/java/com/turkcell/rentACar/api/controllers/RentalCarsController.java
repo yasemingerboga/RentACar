@@ -34,9 +34,14 @@ public class RentalCarsController {
 		this.rentalCarService = rentalCarService;
 	}
 
-	@PostMapping("/add")
-	Result add(@RequestBody @Valid CreateRentalModel rentalModel) {
-		return this.rentalCarService.add(rentalModel);
+	@PostMapping("/addForCorporateCustomer")
+	Result addForCorporateCustomer(@RequestBody @Valid CreateRentalModel rentalModel) {
+		return this.rentalCarService.addForCorporateCustomer(rentalModel);
+	}
+
+	@PostMapping("/addForIndividualCustomer")
+	Result addForIndividualCustomer(@RequestBody @Valid CreateRentalModel rentalModel) {
+		return this.rentalCarService.addForIndividualCustomer(rentalModel);
 	}
 
 	@GetMapping("/getByRentalId/{rentalId}")

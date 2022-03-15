@@ -11,7 +11,9 @@ import com.turkcell.rentACar.core.utilities.results.Result;
 
 public interface RentalCarService {
 
-	Result add(CreateRentalModel rentalModel);
+	Result addForCorporateCustomer(CreateRentalModel rentalModel);
+	
+	Result addForIndividualCustomer(CreateRentalModel rentalModel);
 
 	DataResult<GetRentalCarDto> getById(int id);
 

@@ -11,7 +11,8 @@ import com.turkcell.rentACar.api.controllers.models.CreateRentalModel;
 import com.turkcell.rentACar.api.controllers.models.UpdateRentalModel;
 import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
-import com.turkcell.rentACar.business.abstracts.CarService;
+import com.turkcell.rentACar.business.abstracts.CorporateCustomerService;
+import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
 import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
 import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
@@ -35,21 +36,24 @@ public class RentalCarManager implements RentalCarService {
 	private RentalCarDao rentalCarDao;
 	private ModelMapperService modelMapperService;
 	private CarMaintenanceService carMaintenanceService;
-	private CarService carService;
-	private OrderedAdditionalServiceService orderedAdditionalProductService;
-	private AdditionalServiceService additionalProductService;
+	private OrderedAdditionalServiceService orderedAdditionalServiceService;
+	private AdditionalServiceService additionalServiceService;
+	private IndividualCustomerService individualCustomerService;
+	private CorporateCustomerService corporateCustomerService;
 
 	@Autowired
 	public RentalCarManager(RentalCarDao rentalCarDao, ModelMapperService modelMapperService,
-			CarMaintenanceService carMaintenanceService, CarService carService,
-			OrderedAdditionalServiceService orderedAdditionalProductService,
-			AdditionalServiceService additionalProductService) {
+			CarMaintenanceService carMaintenanceService,
+			OrderedAdditionalServiceService orderedAdditionalServiceService,
+			AdditionalServiceService additionalServiceService, IndividualCustomerService individualCustomerService,
+			CorporateCustomerService corporateCustomerService) {
 		this.rentalCarDao = rentalCarDao;
 		this.modelMapperService = modelMapperService;
 		this.carMaintenanceService = carMaintenanceService;
-		this.carService = carService;
-		this.orderedAdditionalProductService = orderedAdditionalProductService;
-		this.additionalProductService = additionalProductService;
+		this.orderedAdditionalServiceService = orderedAdditionalServiceService;
+		this.additionalServiceService = additionalServiceService;
+		this.individualCustomerService = individualCustomerService;
+		this.corporateCustomerService = corporateCustomerService;
 	}
 
 	@Override
@@ -87,9 +91,11 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	@Override
-	public Result add(CreateRentalModel rentalModel) {
+	public Result addForCorporateCustomer(CreateRentalModel rentalModel) {
 
-		checkIfCarExist(rentalModel.getCreateRentalCarRequest().getCarId());
+		checkIfCorporateCustomerExists(rentalModel.getCreateRentalCarRequest().getCustomerUserId());
+
+		checkIfCarExists(rentalModel.getCreateRentalCarRequest().getCarId());
 
 		RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalModel.getCreateRentalCarRequest(),
 				RentalCar.class);
@@ -97,13 +103,13 @@ public class RentalCarManager implements RentalCarService {
 		checkIfInMaintenance(rentalCar);
 		checkIfInRent(rentalCar);
 
-		List<OrderedAdditionalService> additionalServices = rentalModel
+		List<OrderedAdditionalService> orderedAdditionalServices = rentalModel
 				.getCreateOrderedAdditionalServiceRequest().stream().map(additionalService -> this.modelMapperService
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
 
-		additionalServices.equals(mappingOrderedAdditionalService(additionalServices));
-		rentalCar.setOrderedAdditionalServices(additionalServices);
+		orderedAdditionalServices.equals(mappingOrderedAdditionalService(orderedAdditionalServices));
+		rentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
 
 		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
 		rentalCar.equals(checkIfOrderedAdditionalServicesExists(rentalCar));
@@ -113,13 +119,56 @@ public class RentalCarManager implements RentalCarService {
 		return new SuccessResult("Rental car saved successfully.");
 	}
 
+	@Override
+	public Result addForIndividualCustomer(CreateRentalModel rentalModel) {
+
+		checkIfIndividualCustomerExists(rentalModel.getCreateRentalCarRequest().getCustomerUserId());
+
+		checkIfCarExists(rentalModel.getCreateRentalCarRequest().getCarId());
+
+		RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalModel.getCreateRentalCarRequest(),
+				RentalCar.class);
+
+		checkIfInMaintenance(rentalCar);
+		checkIfInRent(rentalCar);
+
+		List<OrderedAdditionalService> orderedAdditionalServices = rentalModel
+				.getCreateOrderedAdditionalServiceRequest().stream().map(additionalService -> this.modelMapperService
+						.forRequest().map(additionalService, OrderedAdditionalService.class))
+				.collect(Collectors.toList());
+
+		orderedAdditionalServices.equals(mappingOrderedAdditionalService(orderedAdditionalServices));
+		rentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
+
+		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
+		rentalCar.equals(checkIfOrderedAdditionalServicesExists(rentalCar));
+
+		this.rentalCarDao.save(rentalCar);
+
+		return new SuccessResult("Rental car saved successfully.");
+	}
+
+	private void checkIfIndividualCustomerExists(int id) {
+		if (!individualCustomerService.existById(id).isSuccess()) {
+			throw new BusinessException("There is no individual customer with the specified id.");
+		}
+	}
+
+	private void checkIfCorporateCustomerExists(int id) {
+		if (!corporateCustomerService.existById(id).isSuccess()) {
+			throw new BusinessException("There is no corporate customer with the specified id.");
+		}
+	}
+
 	private List<OrderedAdditionalService> mappingOrderedAdditionalService(
 			List<OrderedAdditionalService> orderedAdditionalServices) {
+
+		checkIfAdditionalServiceExists(orderedAdditionalServices);
 
 		List<GetAdditionalServiceDto> getAdditionalServiceDtos = new ArrayList<>();
 
 		orderedAdditionalServices.forEach(orderedAdditionalService -> {
-			getAdditionalServiceDtos.add(additionalProductService
+			getAdditionalServiceDtos.add(additionalServiceService
 					.getById(orderedAdditionalService.getAdditionalService().getId()).getData());
 		});
 
@@ -133,9 +182,21 @@ public class RentalCarManager implements RentalCarService {
 		return orderedAdditionalServices;
 	}
 
+	private void checkIfAdditionalServiceExists(List<OrderedAdditionalService> orderedAdditionalServices) {
+
+		for (OrderedAdditionalService orderedAdditionalService : orderedAdditionalServices) {
+
+			if (!additionalServiceService.existById(orderedAdditionalService.getId()).isSuccess()) {
+
+				throw new BusinessException("There is no additional service with the specified id.");
+			}
+		}
+	}
+
 	private RentalCar checkIfAdditionalPrice(RentalCar rentalCar) {
 
 		if (rentalCar.getRentedCity().getId() != rentalCar.getDropOffCity().getId()) {
+
 			rentalCar.setAdditionalPrice(750.0);
 		}
 		return rentalCar;
@@ -144,6 +205,7 @@ public class RentalCarManager implements RentalCarService {
 	private RentalCar checkIfOrderedAdditionalServicesExists(RentalCar rentalCar) {
 
 		if (!rentalCar.getOrderedAdditionalServices().isEmpty()) {
+
 			rentalCar.getOrderedAdditionalServices().forEach(orderedAdditionalService -> {
 				rentalCar.setAdditionalPrice(
 						rentalCar.getAdditionalPrice() + orderedAdditionalService.getAdditionalService().getPrice());
@@ -164,12 +226,15 @@ public class RentalCarManager implements RentalCarService {
 		}
 
 		for (CarMaintenanceListDto carMaintenanceDto : result) {
+
 			if ((carMaintenanceDto.getReturnDate() != null)
 					&& (rentalCar.getStartingDate().isBefore(carMaintenanceDto.getReturnDate())
 							|| rentalCar.getEndDate().isBefore(carMaintenanceDto.getReturnDate()))) {
+
 				throw new BusinessException("This car cannot be rented as it is under maintenance.");
 			}
 			if (carMaintenanceDto.getReturnDate() == null) {
+
 				throw new BusinessException(
 						"This car cannot be rented as it is under maintenance / return date equals null.");
 			}
@@ -197,7 +262,8 @@ public class RentalCarManager implements RentalCarService {
 
 	@Override
 	public Result update(UpdateRentalModel updateRentalModel) {
-		orderedAdditionalProductService.deleteByRentalCarId(updateRentalModel.getUpdateRentalCarRequest().getId());
+
+		orderedAdditionalServiceService.deleteByRentalCarId(updateRentalModel.getUpdateRentalCarRequest().getId());
 
 		RentalCar updatedRentalCar = this.modelMapperService.forRequest()
 				.map(updateRentalModel.getUpdateRentalCarRequest(), RentalCar.class);
@@ -221,31 +287,32 @@ public class RentalCarManager implements RentalCarService {
 
 		return new SuccessResult("Rental car is updated.");
 	}
-	
-	public boolean checkIfCarExist(int carId) {
 
-		if (this.carService.getById(carId) == null) {
-			throw new BusinessException("There is no car with a specified id.");
+	public void checkIfCarExists(int carId) {
+
+		if (!rentalCarDao.existsByCarId(carId)) {
+
+			throw new BusinessException("There is no car with the specified id.");
 		}
-
-		return true;
 	}
 
 	@Override
 	public Result delete(int id) {
 
 		checkIfRentalCarExists(id);
+
 		this.rentalCarDao.deleteById(id);
+
 		return new SuccessResult("Deleted successfully.");
 	}
 
-	public boolean checkIfRentalCarExists(int rentalId) {
+	public void checkIfRentalCarExists(int rentalCarId) {
 
-		if (this.rentalCarDao.getById(rentalId) == null) {
-			throw new BusinessException("The rental car with this ID is not available.");
+		if (!rentalCarDao.existsById(rentalCarId)) {
+
+			throw new BusinessException("There is no rental car with the specified id.");
+
 		}
-
-		return true;
 	}
 
 }

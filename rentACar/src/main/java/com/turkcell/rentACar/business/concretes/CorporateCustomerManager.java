@@ -13,6 +13,7 @@ import com.turkcell.rentACar.business.requests.CorporateCustomer.CreateCorporate
 import com.turkcell.rentACar.business.requests.CorporateCustomer.UpdateCorporateCustomerRequest;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
+import com.turkcell.rentACar.core.utilities.results.ErrorResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -70,5 +71,16 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 				.forDto().map(corporateCustomer, CorporateCustomerListDto.class)).collect(Collectors.toList());
 		return new SuccessDataResult<List<CorporateCustomerListDto>>(response,
 				"Corporate customers listed successfully.");
+	}
+
+	@Override
+	public Result existById(int id) {
+
+		if (!corporateCustomerDao.existsById(id)) {
+
+			return new ErrorResult("There is no corporate user found with specified id.");
+		}
+
+		return new SuccessResult("Getting corporate user successfully.");
 	}
 }

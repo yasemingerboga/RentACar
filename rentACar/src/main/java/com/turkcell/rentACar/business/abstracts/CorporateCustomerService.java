@@ -19,4 +19,6 @@ public interface CorporateCustomerService {
 	DataResult<GetCorporateCustomerDto> getById(int id);
 
 	DataResult<List<CorporateCustomerListDto>> getAll();
+
+	Result existById(int id);
 }

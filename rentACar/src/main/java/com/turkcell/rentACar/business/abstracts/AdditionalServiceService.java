@@ -19,4 +19,6 @@ public interface AdditionalServiceService {
 	Result delete(int id);
 
 	Result update(UpdateAdditionalServiceRequest updateAdditionalServiceRequest);
+
+	Result existById(int id);
 }

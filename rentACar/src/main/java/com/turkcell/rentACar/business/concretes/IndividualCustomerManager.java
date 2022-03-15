@@ -13,6 +13,7 @@ import com.turkcell.rentACar.business.requests.IndividualCustomer.CreateIndividu
 import com.turkcell.rentACar.business.requests.IndividualCustomer.UpdateIndividualCustomerRequest;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
+import com.turkcell.rentACar.core.utilities.results.ErrorResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -70,5 +71,16 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 				.forDto().map(individualCustomer, IndividualCustomerListDto.class)).collect(Collectors.toList());
 		return new SuccessDataResult<List<IndividualCustomerListDto>>(response,
 				"Individual customers listed successfully.");
+	}
+
+	@Override
+	public Result existById(int id) {
+
+		if (!individualCustomerDao.existsById(id)) {
+
+			return new ErrorResult("There is no individual customer found with specified id.");
+		}
+
+		return new SuccessResult("Getting individual user successfully.");
 	}
 }

@@ -14,12 +14,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetRentalCarDto {
+
 	private int id;
+
 	private LocalDate startingDate;
+
 	private LocalDate endDate;
+
 	private int carId;
+
 	private Double additionalPrice;
+
 	private GetCityDto rentalCityDto;
+
 	private GetCityDto dropOffCityDto;
+
 	private List<OrderedAdditionalServiceListDto> orderedAdditionalServiceList;
+
+	private int invoiceId;
+
+	private int customerUserId;
 }

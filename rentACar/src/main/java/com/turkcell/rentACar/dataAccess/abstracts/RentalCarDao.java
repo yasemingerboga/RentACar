@@ -8,10 +8,11 @@ import org.springframework.stereotype.Repository;
 import com.turkcell.rentACar.entities.concretes.RentalCar;
 
 @Repository
-public interface RentalCarDao extends JpaRepository<RentalCar, Integer>{
-	
+public interface RentalCarDao extends JpaRepository<RentalCar, Integer> {
+
 	List<RentalCar> getByCar_Id(int carId);
 
 	RentalCar getById(int rentalId);
 
+	boolean existsByCarId(int carId);
 }
