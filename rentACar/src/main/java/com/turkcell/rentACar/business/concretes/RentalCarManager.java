@@ -11,11 +11,13 @@ import com.turkcell.rentACar.api.controllers.models.CreateRentalModel;
 import com.turkcell.rentACar.api.controllers.models.UpdateRentalModel;
 import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
+import com.turkcell.rentACar.business.abstracts.CarService;
 import com.turkcell.rentACar.business.abstracts.CorporateCustomerService;
 import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
 import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
 import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
+import com.turkcell.rentACar.business.dtos.Car.GetCarDto;
 import com.turkcell.rentACar.business.dtos.CarMaintenance.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
@@ -27,6 +29,7 @@ import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
 import com.turkcell.rentACar.dataAccess.abstracts.RentalCarDao;
 import com.turkcell.rentACar.entities.concretes.AdditionalService;
+import com.turkcell.rentACar.entities.concretes.Car;
 import com.turkcell.rentACar.entities.concretes.OrderedAdditionalService;
 import com.turkcell.rentACar.entities.concretes.RentalCar;
 
@@ -40,13 +43,14 @@ public class RentalCarManager implements RentalCarService {
 	private AdditionalServiceService additionalServiceService;
 	private IndividualCustomerService individualCustomerService;
 	private CorporateCustomerService corporateCustomerService;
+	private CarService carService;
 
 	@Autowired
 	public RentalCarManager(RentalCarDao rentalCarDao, ModelMapperService modelMapperService,
 			CarMaintenanceService carMaintenanceService,
 			OrderedAdditionalServiceService orderedAdditionalServiceService,
 			AdditionalServiceService additionalServiceService, IndividualCustomerService individualCustomerService,
-			CorporateCustomerService corporateCustomerService) {
+			CorporateCustomerService corporateCustomerService, CarService carService) {
 		this.rentalCarDao = rentalCarDao;
 		this.modelMapperService = modelMapperService;
 		this.carMaintenanceService = carMaintenanceService;
@@ -54,6 +58,7 @@ public class RentalCarManager implements RentalCarService {
 		this.additionalServiceService = additionalServiceService;
 		this.individualCustomerService = individualCustomerService;
 		this.corporateCustomerService = corporateCustomerService;
+		this.carService = carService;
 	}
 
 	@Override
@@ -178,6 +183,7 @@ public class RentalCarManager implements RentalCarService {
 				.collect(Collectors.toList());
 		for (int i = 0; i < orderedAdditionalServices.size(); i++) {
 			orderedAdditionalServices.get(i).setAdditionalService(additionalServices.get(i));
+			orderedAdditionalServices.get(i).setId(0);
 		}
 		return orderedAdditionalServices;
 	}
@@ -186,7 +192,8 @@ public class RentalCarManager implements RentalCarService {
 
 		for (OrderedAdditionalService orderedAdditionalService : orderedAdditionalServices) {
 
-			if (!additionalServiceService.existById(orderedAdditionalService.getId()).isSuccess()) {
+			if (!additionalServiceService.existById(orderedAdditionalService.getAdditionalService().getId())
+					.isSuccess()) {
 
 				throw new BusinessException("There is no additional service with the specified id.");
 			}
@@ -290,7 +297,7 @@ public class RentalCarManager implements RentalCarService {
 
 	public void checkIfCarExists(int carId) {
 
-		if (!rentalCarDao.existsByCarId(carId)) {
+		if (!carService.existsById(carId).isSuccess()) {
 
 			throw new BusinessException("There is no car with the specified id.");
 		}

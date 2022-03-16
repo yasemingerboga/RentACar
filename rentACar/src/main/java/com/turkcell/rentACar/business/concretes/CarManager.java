@@ -17,6 +17,7 @@ import com.turkcell.rentACar.business.requests.Car.UpdateCarRequest;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.ErrorDataResult;
+import com.turkcell.rentACar.core.utilities.results.ErrorResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -100,6 +101,16 @@ public class CarManager implements CarService {
 		List<CarListDto> response = result.stream()
 				.map(car -> this.modelMapperService.forDto().map(car, CarListDto.class)).collect(Collectors.toList());
 		return new SuccessDataResult<List<CarListDto>>(response);
+	}
+
+	@Override
+	public Result existsById(int id) {
+		if (!carDao.existsById(id)) {
+
+			return new ErrorResult("There is no car found with specified id.");
+		}
+
+		return new SuccessResult("Getting car successfully.");
 	}
 
 }
