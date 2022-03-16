@@ -17,13 +17,13 @@ public class InvoiceListDto {
 
 	private LocalDate creationDate;
 
-	private int totalRentDay;
-
 	private double totalPrice;
 
 	private int customerUserId;
 
 	private int rentalCarId;
+
+	private int rentalCarTotalRentDay;
 
 	private LocalDate rentalCarStartingDate;
 

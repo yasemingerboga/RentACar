@@ -37,6 +37,12 @@ public class RentalCar {
 	@Column(name = "end_date")
 	private LocalDate endDate;
 
+	@Column(name = "total_rent_day")
+	private int totalRentDay;
+
+	@Column(name = "total_price")
+	private Double totalPrice;
+
 	@Column(name = "additional_price")
 	private Double additionalPrice = 0.0;
 
@@ -57,7 +63,7 @@ public class RentalCar {
 
 	@OneToOne(mappedBy = "rentalCar")
 	private Invoice invoice;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private Customer customer;

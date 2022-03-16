@@ -29,6 +29,10 @@ public class GetRentalCarDto {
 
 	private GetCityDto dropOffCityDto;
 
+	private int totalRentDay;
+
+	private Double totalPrice;
+
 	private List<OrderedAdditionalServiceListDto> orderedAdditionalServiceList;
 
 	private int invoiceId;

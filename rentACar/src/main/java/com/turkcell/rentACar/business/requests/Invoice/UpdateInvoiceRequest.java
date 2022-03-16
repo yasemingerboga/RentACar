@@ -17,8 +17,6 @@ public class UpdateInvoiceRequest {
 
 	private LocalDate creationDate;
 
-	private int totalRentDay;
-	
 	private int customerUserId;
 
 	private int rentalCarId;

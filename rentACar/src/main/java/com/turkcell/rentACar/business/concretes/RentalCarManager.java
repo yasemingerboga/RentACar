@@ -1,5 +1,7 @@
 package com.turkcell.rentACar.business.concretes;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +19,6 @@ import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
 import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
 import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
-import com.turkcell.rentACar.business.dtos.Car.GetCarDto;
 import com.turkcell.rentACar.business.dtos.CarMaintenance.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
@@ -29,7 +30,6 @@ import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
 import com.turkcell.rentACar.dataAccess.abstracts.RentalCarDao;
 import com.turkcell.rentACar.entities.concretes.AdditionalService;
-import com.turkcell.rentACar.entities.concretes.Car;
 import com.turkcell.rentACar.entities.concretes.OrderedAdditionalService;
 import com.turkcell.rentACar.entities.concretes.RentalCar;
 
@@ -119,9 +119,18 @@ public class RentalCarManager implements RentalCarService {
 		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
 		rentalCar.equals(checkIfOrderedAdditionalServicesExists(rentalCar));
 
+		rentalCar.setTotalRentDay(calculateTotalRentDay(rentalCar));
+
+		rentalCar.setTotalPrice(calculateTotalPrice(rentalCar));
+
 		this.rentalCarDao.save(rentalCar);
 
 		return new SuccessResult("Rental car saved successfully.");
+	}
+
+	private Double calculateTotalPrice(RentalCar rentalCar) {
+		Double dailyPrice = carService.getById(rentalCar.getCar().getId()).getData().getDailyPrice();
+		return rentalCar.getAdditionalPrice() + (dailyPrice * rentalCar.getTotalRentDay());
 	}
 
 	@Override
@@ -148,6 +157,10 @@ public class RentalCarManager implements RentalCarService {
 		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
 		rentalCar.equals(checkIfOrderedAdditionalServicesExists(rentalCar));
 
+		rentalCar.setTotalRentDay(calculateTotalRentDay(rentalCar));
+
+		rentalCar.setTotalPrice(calculateTotalPrice(rentalCar));
+
 		this.rentalCarDao.save(rentalCar);
 
 		return new SuccessResult("Rental car saved successfully.");
@@ -160,7 +173,9 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	private void checkIfCorporateCustomerExists(int id) {
+		
 		if (!corporateCustomerService.existById(id).isSuccess()) {
+			
 			throw new BusinessException("There is no corporate customer with the specified id.");
 		}
 	}
@@ -290,6 +305,10 @@ public class RentalCarManager implements RentalCarService {
 		updatedRentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
 		updatedRentalCar.equals(checkIfOrderedAdditionalServicesExists(updatedRentalCar));
 
+		updatedRentalCar.setTotalRentDay(calculateTotalRentDay(updatedRentalCar));
+
+		updatedRentalCar.setTotalPrice(calculateTotalPrice(updatedRentalCar));
+
 		this.rentalCarDao.save(updatedRentalCar);
 
 		return new SuccessResult("Rental car is updated.");
@@ -320,6 +339,17 @@ public class RentalCarManager implements RentalCarService {
 			throw new BusinessException("There is no rental car with the specified id.");
 
 		}
+	}
+
+	private int calculateTotalRentDay(RentalCar rentalCar) {
+
+		LocalDate startingDay = LocalDate.of(rentalCar.getStartingDate().getYear(),
+				rentalCar.getStartingDate().getMonthValue(), rentalCar.getStartingDate().getDayOfMonth());
+		LocalDate endDay = LocalDate.of(rentalCar.getEndDate().getYear(), rentalCar.getEndDate().getMonthValue(),
+				rentalCar.getEndDate().getDayOfMonth());
+
+		Period period = Period.between(startingDay, endDay);
+		return Math.abs(period.getDays());
 	}
 
 }
