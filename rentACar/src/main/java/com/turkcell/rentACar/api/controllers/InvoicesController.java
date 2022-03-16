@@ -1,9 +1,11 @@
 package com.turkcell.rentACar.api.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +56,18 @@ public class InvoicesController {
 	@PutMapping("/update")
 	public Result update(@RequestBody @Valid UpdateInvoiceRequest updateColorRequest) {
 		return this.invoiceService.update(updateColorRequest);
+	}
+
+	@GetMapping("/getByCustomerId/{id}")
+	public DataResult<List<InvoiceListDto>> getByCustomerId(@RequestParam int id) {
+		return this.invoiceService.getByCustomerId(id);
+	}
+
+	@GetMapping("/getAllByBetweenStartDateAndEndDate")
+	public DataResult<List<InvoiceListDto>> getAllByBetweenStartDateAndEndDate(
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd") @RequestParam("startDate") LocalDate startDate,
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd") @RequestParam("endDate") LocalDate endDate) {
+		return this.invoiceService.getAllByBetweenStartDateAndEndDate(startDate, endDate);
 	}
 
 }

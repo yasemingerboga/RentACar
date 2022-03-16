@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.business.concretes;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,6 +81,30 @@ public class InvoiceManager implements InvoiceService {
 		this.invoiceDao.save(invoice);
 
 		return new SuccessResult("Invoice updated successfully.");
+	}
+
+	@Override
+	public DataResult<List<InvoiceListDto>> getByCustomerId(int id) {
+
+		List<Invoice> result = invoiceDao.getByCustomer_Id(id);
+
+		List<InvoiceListDto> response = result.stream()
+				.map(color -> this.modelMapperService.forDto().map(color, InvoiceListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<InvoiceListDto>>(response, "Invoices listed successfully.");
+	}
+
+	@Override
+	public DataResult<List<InvoiceListDto>> getAllByBetweenStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
+
+		List<Invoice> result = this.invoiceDao.getAllByBetweenStartDateAndEndDate(startDate, endDate);
+		List<InvoiceListDto> response = result.stream()
+				.map(invoice -> modelMapperService.forDto().map(invoice, InvoiceListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<InvoiceListDto>>(response,
+				"Invoices between start date and end date listed successfully.");
 	}
 
 }

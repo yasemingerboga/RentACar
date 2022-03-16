@@ -1,10 +1,10 @@
 package com.turkcell.rentACar.entities.concretes;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -19,6 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Customer extends User {
+
+	@Column(name = "register_date")
+	private LocalDate registerDate;
 
 	@OneToMany(mappedBy = "customer")
 	private List<Invoice> invoices;
