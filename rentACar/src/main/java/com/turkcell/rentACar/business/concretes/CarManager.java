@@ -113,4 +113,16 @@ public class CarManager implements CarService {
 		return new SuccessResult("Getting car successfully.");
 	}
 
+	@Override
+	public Result updateKilometer(int id, Double kilometer) {
+
+		Car car = carDao.getById(id);
+
+		car.setKilometer(kilometer);
+
+		carDao.save(car);
+		return new SuccessResult("Kilometer updated.");
+
+	}
+
 }

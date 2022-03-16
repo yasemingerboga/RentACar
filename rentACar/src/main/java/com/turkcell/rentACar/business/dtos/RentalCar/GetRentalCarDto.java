@@ -38,4 +38,9 @@ public class GetRentalCarDto {
 	private int invoiceId;
 
 	private int customerUserId;
+
+	private Double startingKilometer;
+
+	private Double endingKilometer;
+
 }

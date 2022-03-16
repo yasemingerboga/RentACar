@@ -10,14 +10,16 @@ import lombok.NoArgsConstructor;
 public class CarListDto {
 
 	private int carId;
-	
+
 	private double dailyPrice;
-	
+
 	private int modelYear;
-	
+
 	private String description;
-	
+
 	private String brandName;
-	
+
 	private String colorName;
+
+	private Double kilometer;
 }

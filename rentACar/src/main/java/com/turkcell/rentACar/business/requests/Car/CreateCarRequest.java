@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateCarRequest {
-	
+
 	@NotNull
 	@Min(0)
 	private double dailyPrice;
@@ -26,4 +26,5 @@ public class CreateCarRequest {
 	@NotNull
 	@Min(1)
 	private int colorId;
+	private Double kilometer;
 }

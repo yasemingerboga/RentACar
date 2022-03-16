@@ -22,32 +22,38 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="cars")
+@Table(name = "cars")
 public class Car {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="car_id")
+	@Column(name = "car_id")
 	private int id;
-	
-	@Column(name="daily_price")
+
+	@Column(name = "daily_price")
 	private double dailyPrice;
-	
-	@Column(name="model_year")
+
+	@Column(name = "model_year")
 	private int modelYear;
-	
-	@Column(name="description")
+
+	@Column(name = "description")
 	private String description;
-	
+
+	@Column(name = "kilometer")
+	private Double kilometer;
+
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="brand_id")
+	@JoinColumn(name = "brand_id")
 	private Brand brand;
-	
+
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="color_id")
+	@JoinColumn(name = "color_id")
 	private Color color;
-	
+
 	@OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<CarMaintenance> carMaintenances;
+
+	@OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<CarDamage> carDamages;
 
 }

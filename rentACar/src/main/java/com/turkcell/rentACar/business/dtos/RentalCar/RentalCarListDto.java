@@ -38,4 +38,8 @@ public class RentalCarListDto {
 	private int invoiceId;
 
 	private int customerUserId;
+
+	private Double startingKilometer;
+
+	private Double endingKilometer;
 }

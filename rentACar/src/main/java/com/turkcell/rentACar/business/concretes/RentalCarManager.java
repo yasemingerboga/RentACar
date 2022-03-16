@@ -22,6 +22,7 @@ import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServic
 import com.turkcell.rentACar.business.dtos.CarMaintenance.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
+import com.turkcell.rentACar.business.requests.RentalCar.EndOfRent;
 import com.turkcell.rentACar.core.utilities.exceptions.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
@@ -30,6 +31,7 @@ import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
 import com.turkcell.rentACar.dataAccess.abstracts.RentalCarDao;
 import com.turkcell.rentACar.entities.concretes.AdditionalService;
+import com.turkcell.rentACar.entities.concretes.Car;
 import com.turkcell.rentACar.entities.concretes.OrderedAdditionalService;
 import com.turkcell.rentACar.entities.concretes.RentalCar;
 
@@ -123,6 +125,8 @@ public class RentalCarManager implements RentalCarService {
 
 		rentalCar.setTotalPrice(calculateTotalPrice(rentalCar));
 
+		rentalCar.setStartingKilometer(carService.getById(rentalCar.getCar().getId()).getData().getKilometer());
+
 		this.rentalCarDao.save(rentalCar);
 
 		return new SuccessResult("Rental car saved successfully.");
@@ -161,6 +165,8 @@ public class RentalCarManager implements RentalCarService {
 
 		rentalCar.setTotalPrice(calculateTotalPrice(rentalCar));
 
+		rentalCar.setStartingKilometer(rentalCar.getCar().getKilometer());
+
 		this.rentalCarDao.save(rentalCar);
 
 		return new SuccessResult("Rental car saved successfully.");
@@ -173,9 +179,9 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	private void checkIfCorporateCustomerExists(int id) {
-		
+
 		if (!corporateCustomerService.existById(id).isSuccess()) {
-			
+
 			throw new BusinessException("There is no corporate customer with the specified id.");
 		}
 	}
@@ -350,6 +356,20 @@ public class RentalCarManager implements RentalCarService {
 
 		Period period = Period.between(startingDay, endDay);
 		return Math.abs(period.getDays());
+	}
+
+	@Override
+	public Result endOfRent(EndOfRent endOfRent) {
+
+		RentalCar rentalCar = rentalCarDao.getById(endOfRent.getId());
+
+		rentalCar.setEndingKilometer(endOfRent.getEndingKilometer());
+
+		carService.updateKilometer(rentalCar.getCar().getId(), rentalCar.getEndingKilometer());
+
+		rentalCarDao.save(rentalCar);
+
+		return new SuccessResult("Rent ends.");
 	}
 
 }
