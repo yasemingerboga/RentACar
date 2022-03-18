@@ -41,7 +41,7 @@ public class CarDamagesController {
 	public Result add(@RequestBody @Valid CreateCarDamageRequest createCarDamageRequest) {
 		return carDamageService.add(createCarDamageRequest);
 	}
-	
+
 	@GetMapping("/get/{id}")
 	public DataResult<GetCarDamageDto> getById(@RequestParam int id) {
 		return carDamageService.getById(id);

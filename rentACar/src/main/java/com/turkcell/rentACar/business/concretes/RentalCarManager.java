@@ -115,7 +115,8 @@ public class RentalCarManager implements RentalCarService {
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
 
-		orderedAdditionalServices.equals(mappingOrderedAdditionalService(orderedAdditionalServices));
+		rentalCar.setOrderedAdditionalServices(mappingOrderedAdditionalService(orderedAdditionalServices, rentalCar));
+
 		rentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
 
 		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
@@ -155,8 +156,7 @@ public class RentalCarManager implements RentalCarService {
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
 
-		orderedAdditionalServices.equals(mappingOrderedAdditionalService(orderedAdditionalServices));
-		rentalCar.setOrderedAdditionalServices(orderedAdditionalServices);
+		rentalCar.setOrderedAdditionalServices(mappingOrderedAdditionalService(orderedAdditionalServices, rentalCar));
 
 		rentalCar.equals(checkIfAdditionalPrice(rentalCar));
 		rentalCar.equals(checkIfOrderedAdditionalServicesExists(rentalCar));
@@ -165,7 +165,7 @@ public class RentalCarManager implements RentalCarService {
 
 		rentalCar.setTotalPrice(calculateTotalPrice(rentalCar));
 
-		rentalCar.setStartingKilometer(rentalCar.getCar().getKilometer());
+		rentalCar.setStartingKilometer(carService.getById(rentalCar.getCar().getId()).getData().getKilometer());
 
 		this.rentalCarDao.save(rentalCar);
 
@@ -187,24 +187,13 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	private List<OrderedAdditionalService> mappingOrderedAdditionalService(
-			List<OrderedAdditionalService> orderedAdditionalServices) {
+			List<OrderedAdditionalService> orderedAdditionalServices, RentalCar rentalCar) {
 
 		checkIfAdditionalServiceExists(orderedAdditionalServices);
 
-		List<GetAdditionalServiceDto> getAdditionalServiceDtos = new ArrayList<>();
-
-		orderedAdditionalServices.forEach(orderedAdditionalService -> {
-			getAdditionalServiceDtos.add(additionalServiceService
-					.getById(orderedAdditionalService.getAdditionalService().getId()).getData());
-		});
-
-		List<AdditionalService> additionalServices = getAdditionalServiceDtos.stream()
-				.map(additionalService -> this.modelMapperService.forRequest().map(additionalService,
-						AdditionalService.class))
-				.collect(Collectors.toList());
 		for (int i = 0; i < orderedAdditionalServices.size(); i++) {
-			orderedAdditionalServices.get(i).setAdditionalService(additionalServices.get(i));
 			orderedAdditionalServices.get(i).setId(0);
+			orderedAdditionalServices.get(i).setRentalCar(rentalCar);
 		}
 		return orderedAdditionalServices;
 	}
@@ -235,8 +224,9 @@ public class RentalCarManager implements RentalCarService {
 		if (!rentalCar.getOrderedAdditionalServices().isEmpty()) {
 
 			rentalCar.getOrderedAdditionalServices().forEach(orderedAdditionalService -> {
-				rentalCar.setAdditionalPrice(
-						rentalCar.getAdditionalPrice() + orderedAdditionalService.getAdditionalService().getPrice());
+				Double additionalServicePrice = additionalServiceService
+						.getById(orderedAdditionalService.getAdditionalService().getId()).getData().getPrice();
+				rentalCar.setAdditionalPrice(rentalCar.getAdditionalPrice() + additionalServicePrice);
 				orderedAdditionalService.setRentalCar(rentalCar);
 			});
 		}
@@ -304,7 +294,8 @@ public class RentalCarManager implements RentalCarService {
 						.forRequest().map(additionalService, OrderedAdditionalService.class))
 				.collect(Collectors.toList());
 
-		orderedAdditionalServices.equals(mappingOrderedAdditionalService(orderedAdditionalServices));
+		updatedRentalCar.setOrderedAdditionalServices(
+				mappingOrderedAdditionalService(orderedAdditionalServices, updatedRentalCar));
 
 		updatedRentalCar.equals(checkIfAdditionalPrice(updatedRentalCar));
 
