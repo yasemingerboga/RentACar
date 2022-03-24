@@ -9,12 +9,13 @@ import com.turkcell.rentACar.business.requests.Invoice.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.requests.Invoice.UpdateInvoiceRequest;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
+import com.turkcell.rentACar.entities.concretes.Invoice;
 
 public interface InvoiceService {
 
 	DataResult<List<InvoiceListDto>> getAll();
 
-	Result add(CreateInvoiceRequest createBrandRequest);
+	DataResult<Invoice> add(CreateInvoiceRequest createBrandRequest);
 
 	DataResult<GetInvoiceDto> getById(int id);
 

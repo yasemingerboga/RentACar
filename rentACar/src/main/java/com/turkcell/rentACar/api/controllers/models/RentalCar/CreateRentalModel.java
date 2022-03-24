@@ -1,4 +1,4 @@
-package com.turkcell.rentACar.api.controllers.models;
+package com.turkcell.rentACar.api.controllers.models.RentalCar;
 
 import java.util.List;
 

@@ -2,15 +2,15 @@ package com.turkcell.rentACar.business.concretes;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.turkcell.rentACar.api.controllers.models.CreateRentalModel;
-import com.turkcell.rentACar.api.controllers.models.UpdateRentalModel;
+import com.turkcell.rentACar.api.controllers.models.RentalCar.CreateRentalModel;
+import com.turkcell.rentACar.api.controllers.models.RentalCar.UpdateRentalModel;
 import com.turkcell.rentACar.business.abstracts.AdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACar.business.abstracts.CarService;
@@ -18,7 +18,7 @@ import com.turkcell.rentACar.business.abstracts.CorporateCustomerService;
 import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
 import com.turkcell.rentACar.business.abstracts.OrderedAdditionalServiceService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
-import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.CarMaintenance.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
@@ -30,8 +30,6 @@ import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
 import com.turkcell.rentACar.dataAccess.abstracts.RentalCarDao;
-import com.turkcell.rentACar.entities.concretes.AdditionalService;
-import com.turkcell.rentACar.entities.concretes.Car;
 import com.turkcell.rentACar.entities.concretes.OrderedAdditionalService;
 import com.turkcell.rentACar.entities.concretes.RentalCar;
 
@@ -98,7 +96,8 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	@Override
-	public Result addForCorporateCustomer(CreateRentalModel rentalModel) {
+	@Transactional
+	public DataResult<RentalCar> addForCorporateCustomer(CreateRentalModel rentalModel) {
 
 		checkIfCorporateCustomerExists(rentalModel.getCreateRentalCarRequest().getCustomerUserId());
 
@@ -128,9 +127,9 @@ public class RentalCarManager implements RentalCarService {
 
 		rentalCar.setStartingKilometer(carService.getById(rentalCar.getCar().getId()).getData().getKilometer());
 
-		this.rentalCarDao.save(rentalCar);
+		RentalCar savedRentalCar = this.rentalCarDao.save(rentalCar);
 
-		return new SuccessResult("Rental car saved successfully.");
+		return new SuccessDataResult<RentalCar>(savedRentalCar, "Rental car saved successfully.");
 	}
 
 	private Double calculateTotalPrice(RentalCar rentalCar) {
@@ -139,7 +138,8 @@ public class RentalCarManager implements RentalCarService {
 	}
 
 	@Override
-	public Result addForIndividualCustomer(CreateRentalModel rentalModel) {
+	@Transactional
+	public DataResult<RentalCar> addForIndividualCustomer(CreateRentalModel rentalModel) {
 
 		checkIfIndividualCustomerExists(rentalModel.getCreateRentalCarRequest().getCustomerUserId());
 
@@ -167,9 +167,9 @@ public class RentalCarManager implements RentalCarService {
 
 		rentalCar.setStartingKilometer(carService.getById(rentalCar.getCar().getId()).getData().getKilometer());
 
-		this.rentalCarDao.save(rentalCar);
+		RentalCar savedRentalCar = this.rentalCarDao.save(rentalCar);
 
-		return new SuccessResult("Rental car saved successfully.");
+		return new SuccessDataResult<RentalCar>(savedRentalCar, "Rental car saved successfully.");
 	}
 
 	private void checkIfIndividualCustomerExists(int id) {
@@ -182,7 +182,7 @@ public class RentalCarManager implements RentalCarService {
 
 		if (!corporateCustomerService.existById(id).isSuccess()) {
 
-			throw new BusinessException("There is no corporate customer with the specified id.");
+			throw new BusinessException(BusinessMessages.CORPORATE_NOT_FOUND);
 		}
 	}
 
@@ -202,11 +202,7 @@ public class RentalCarManager implements RentalCarService {
 
 		for (OrderedAdditionalService orderedAdditionalService : orderedAdditionalServices) {
 
-			if (!additionalServiceService.existById(orderedAdditionalService.getAdditionalService().getId())
-					.isSuccess()) {
-
-				throw new BusinessException("There is no additional service with the specified id.");
-			}
+			additionalServiceService.existById(orderedAdditionalService.getAdditionalService().getId());
 		}
 	}
 
@@ -346,7 +342,11 @@ public class RentalCarManager implements RentalCarService {
 				rentalCar.getEndDate().getDayOfMonth());
 
 		Period period = Period.between(startingDay, endDay);
-		return Math.abs(period.getDays());
+		int totalRentDay = Math.abs(period.getDays());
+		if (totalRentDay == 0) {
+			return 1;
+		}
+		return totalRentDay;
 	}
 
 	@Override
@@ -362,5 +362,4 @@ public class RentalCarManager implements RentalCarService {
 
 		return new SuccessResult("Rent ends.");
 	}
-
 }

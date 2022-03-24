@@ -7,15 +7,13 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.turkcell.rentACar.api.controllers.models.CreateRentalModel;
-import com.turkcell.rentACar.api.controllers.models.UpdateRentalModel;
+import com.turkcell.rentACar.api.controllers.models.RentalCar.UpdateRentalModel;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
 import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
@@ -33,16 +31,6 @@ public class RentalCarsController {
 	public RentalCarsController(RentalCarService rentalCarService) {
 		super();
 		this.rentalCarService = rentalCarService;
-	}
-
-	@PostMapping("/addForCorporateCustomer")
-	Result addForCorporateCustomer(@RequestBody @Valid CreateRentalModel rentalModel) {
-		return this.rentalCarService.addForCorporateCustomer(rentalModel);
-	}
-
-	@PostMapping("/addForIndividualCustomer")
-	Result addForIndividualCustomer(@RequestBody @Valid CreateRentalModel rentalModel) {
-		return this.rentalCarService.addForIndividualCustomer(rentalModel);
 	}
 
 	@GetMapping("/getByRentalId/{rentalId}")

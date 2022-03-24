@@ -38,11 +38,6 @@ public class InvoicesController {
 		return invoiceService.getAll();
 	}
 
-	@PostMapping("/add")
-	public Result add(@RequestBody @Valid CreateInvoiceRequest createColorRequest) {
-		return this.invoiceService.add(createColorRequest);
-	}
-
 	@GetMapping("/getbyid/{id}")
 	public DataResult<GetInvoiceDto> getById(@RequestParam int id) {
 		return this.invoiceService.getById(id);

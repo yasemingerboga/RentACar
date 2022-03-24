@@ -17,17 +17,17 @@ public class GetInvoiceDto {
 
 	private LocalDate creationDate;
 
-	private double totalPrice;
+	private int totalRentDay;
+
+	private Double totalPrice;
 
 	private int customerUserId;
 
 	private int rentalCarId;
 
-	private int rentalCarTotalRentDay;
+	private LocalDate startDate;
 
-	private LocalDate rentalCarStartingDate;
-
-	private LocalDate rentalCarEndDate;
+	private LocalDate endDate;
 
 	private Double rentalCarAdditionalPrice;
 

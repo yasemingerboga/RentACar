@@ -11,9 +11,9 @@ import com.turkcell.rentACar.business.dtos.AdditionalService.AdditionalServiceLi
 import com.turkcell.rentACar.business.dtos.AdditionalService.GetAdditionalServiceDto;
 import com.turkcell.rentACar.business.requests.AdditionalService.CreateAdditionalServiceRequest;
 import com.turkcell.rentACar.business.requests.AdditionalService.UpdateAdditionalServiceRequest;
+import com.turkcell.rentACar.core.utilities.exceptions.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
-import com.turkcell.rentACar.core.utilities.results.ErrorResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -77,7 +77,8 @@ public class AdditionalServiceManager implements AdditionalServiceService {
 
 		if (!additionalServiceDao.existsById(id)) {
 
-			return new ErrorResult("There is no additional service found with specified id.");
+			throw new BusinessException("There is no additional service found with specified id.");
+
 		}
 
 		return new SuccessResult("Getting additional service user successfully.");

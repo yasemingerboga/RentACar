@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.turkcell.rentACar.business.abstracts.InvoiceService;
 import com.turkcell.rentACar.business.dtos.Invoice.GetInvoiceDto;
@@ -46,13 +47,13 @@ public class InvoiceManager implements InvoiceService {
 	}
 
 	@Override
-	public Result add(CreateInvoiceRequest createInvoiceRequest) {
+	@Transactional
+	public DataResult<Invoice> add(CreateInvoiceRequest createInvoiceRequest) {
 
 		Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
+		Invoice savedInvoice = this.invoiceDao.save(invoice);
 
-		this.invoiceDao.save(invoice);
-
-		return new SuccessResult("Invoice added successfully.");
+		return new SuccessDataResult<Invoice>(savedInvoice, "Invoice added successfully.");
 	}
 
 	@Override

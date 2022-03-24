@@ -2,19 +2,20 @@ package com.turkcell.rentACar.business.abstracts;
 
 import java.util.List;
 
-import com.turkcell.rentACar.api.controllers.models.CreateRentalModel;
-import com.turkcell.rentACar.api.controllers.models.UpdateRentalModel;
+import com.turkcell.rentACar.api.controllers.models.RentalCar.CreateRentalModel;
+import com.turkcell.rentACar.api.controllers.models.RentalCar.UpdateRentalModel;
 import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
 import com.turkcell.rentACar.business.requests.RentalCar.EndOfRent;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
+import com.turkcell.rentACar.entities.concretes.RentalCar;
 
 public interface RentalCarService {
 
-	Result addForCorporateCustomer(CreateRentalModel rentalModel);
+	DataResult<RentalCar> addForCorporateCustomer(CreateRentalModel rentalModel);
 
-	Result addForIndividualCustomer(CreateRentalModel rentalModel);
+	DataResult<RentalCar> addForIndividualCustomer(CreateRentalModel rentalModel);
 
 	DataResult<GetRentalCarDto> getById(int id);
 

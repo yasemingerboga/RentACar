@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @SuppressWarnings("serial")
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @Data
 public class BusinessException extends RuntimeException {
 	String message;
