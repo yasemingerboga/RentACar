@@ -15,15 +15,17 @@ public interface InvoiceService {
 
 	DataResult<List<InvoiceListDto>> getAll();
 
-	DataResult<Invoice> add(CreateInvoiceRequest createBrandRequest);
+	DataResult<Invoice> add(CreateInvoiceRequest createInvoiceRequest);
 
 	DataResult<GetInvoiceDto> getById(int id);
 
 	Result delete(int id);
 
-	Result update(UpdateInvoiceRequest updateBrandRequest);
+	Result update(UpdateInvoiceRequest updateInvoiceRequest);
 
 	DataResult<List<InvoiceListDto>> getByCustomerId(int id);
 
 	DataResult<List<InvoiceListDto>> getAllByBetweenStartDateAndEndDate(LocalDate startDate, LocalDate endDate);
+
+	DataResult<List<InvoiceListDto>> getbyRentalCarId(int id);
 }

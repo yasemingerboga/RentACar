@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.turkcell.rentACar.api.controllers.models.Payment.PayExtraModel;
 import com.turkcell.rentACar.api.controllers.models.Payment.PaymentModel;
 import com.turkcell.rentACar.api.controllers.models.RentalCar.CreateRentalModel;
 import com.turkcell.rentACar.business.abstracts.CorporateCustomerService;
@@ -18,7 +19,9 @@ import com.turkcell.rentACar.business.abstracts.PosService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
 import com.turkcell.rentACar.business.dtos.CorporateCustomer.GetCorporateCustomerDto;
 import com.turkcell.rentACar.business.dtos.IndividualCustomer.GetIndividualCustomerDto;
+import com.turkcell.rentACar.business.dtos.Invoice.InvoiceListDto;
 import com.turkcell.rentACar.business.dtos.Payment.PaymentListDto;
+import com.turkcell.rentACar.business.dtos.RentalCar.GetRentalCarDto;
 import com.turkcell.rentACar.business.requests.Invoice.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.requests.Invoice.CreateInvoiceRequestForPayment;
 import com.turkcell.rentACar.business.requests.Payment.CreatePaymentRequest;
@@ -89,15 +92,19 @@ public class PaymentManager implements PaymentService {
 	@Transactional
 	public void runPaymentSuccessorForIndividiual(PaymentModel paymentModel) {
 		RentalCar rentalCar = addRentalForIndividualCustomer(paymentModel.getCreateRentalModel());
-		Invoice invoice = addInvoiceForIndividual(paymentModel, rentalCar);
-		addPayment(paymentModel, invoice, rentalCar);
+		Invoice invoice = addInvoiceForIndividual(paymentModel.getCreateInvoiceRequest(),
+				paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId(), rentalCar,
+				rentalCar.getTotalPrice());
+		addPayment(paymentModel.getCreatePaymentRequest(), invoice, rentalCar);
 	}
 
 	@Transactional
 	public void runPaymentSuccessorForCorporate(PaymentModel paymentModel) {
 		RentalCar rentalCar = addRentalForCorporateCustomer(paymentModel.getCreateRentalModel());
-		Invoice invoice = addInvoiceForCorporate(paymentModel, rentalCar);
-		addPayment(paymentModel, invoice, rentalCar);
+		Invoice invoice = addInvoiceForCorporate(paymentModel.getCreateInvoiceRequest(),
+				paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId(), rentalCar,
+				rentalCar.getTotalPrice());
+		addPayment(paymentModel.getCreatePaymentRequest(), invoice, rentalCar);
 	}
 
 	@Transactional
@@ -111,13 +118,12 @@ public class PaymentManager implements PaymentService {
 	}
 
 	@Transactional
-	private Invoice addInvoiceForIndividual(PaymentModel paymentModel, RentalCar rentalCar) {
-		CreateInvoiceRequestForPayment createInvoiceRequestForPayment = paymentModel.getCreateInvoiceRequest();
+	private Invoice addInvoiceForIndividual(CreateInvoiceRequestForPayment createInvoiceRequestForPayment,
+			int customerId, RentalCar rentalCar, Double totalPrice) {
 		Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequestForPayment, Invoice.class);
 
 		invoice.setCreationDate(LocalDate.now());
-		GetIndividualCustomerDto customer = individualCustomerService
-				.getById(paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId()).getData();
+		GetIndividualCustomerDto customer = individualCustomerService.getById(customerId).getData();
 		IndividualCustomer individualCustomer = this.modelMapperService.forRequest().map(customer,
 				IndividualCustomer.class);
 
@@ -126,8 +132,8 @@ public class PaymentManager implements PaymentService {
 		invoice.setInvoiceNumber("123");
 
 		invoice.setRentalCar(rentalCar);
+		invoice.setTotalPrice(totalPrice);
 
-		invoice.setTotalPrice(rentalCar.getTotalPrice());
 		invoice.setTotalRentDay(rentalCar.getTotalRentDay());
 		invoice.setStartDate(rentalCar.getStartingDate());
 		invoice.setEndDate(rentalCar.getEndDate());
@@ -138,14 +144,13 @@ public class PaymentManager implements PaymentService {
 	}
 
 	@Transactional
-	private Invoice addInvoiceForCorporate(PaymentModel paymentModel, RentalCar rentalCar) {
-		CreateInvoiceRequestForPayment createInvoiceRequestForPayment = paymentModel.getCreateInvoiceRequest();
+	private Invoice addInvoiceForCorporate(CreateInvoiceRequestForPayment createInvoiceRequestForPayment,
+			int customerId, RentalCar rentalCar, Double totalPrice) {
 		Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequestForPayment, Invoice.class);
 
 		invoice.setCreationDate(LocalDate.now());
 
-		GetCorporateCustomerDto customer = corporateCustomerService
-				.getById(paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId()).getData();
+		GetCorporateCustomerDto customer = corporateCustomerService.getById(customerId).getData();
 		CorporateCustomer corporateCustomer = this.modelMapperService.forRequest().map(customer,
 				CorporateCustomer.class);
 
@@ -154,8 +159,7 @@ public class PaymentManager implements PaymentService {
 		invoice.setInvoiceNumber("123");
 
 		invoice.setRentalCar(rentalCar);
-
-		invoice.setTotalPrice(rentalCar.getTotalPrice());
+		invoice.setTotalPrice(totalPrice);
 		invoice.setTotalRentDay(rentalCar.getTotalRentDay());
 		invoice.setStartDate(rentalCar.getStartingDate());
 		invoice.setEndDate(rentalCar.getEndDate());
@@ -166,9 +170,7 @@ public class PaymentManager implements PaymentService {
 	}
 
 	@Transactional
-	private Payment addPayment(PaymentModel paymentModel, Invoice invoice, RentalCar rentalCar) {
-
-		CreatePaymentRequest createPaymentRequest = paymentModel.getCreatePaymentRequest();
+	private Payment addPayment(CreatePaymentRequest createPaymentRequest, Invoice invoice, RentalCar rentalCar) {
 		Payment payment = this.modelMapperService.forRequest().map(createPaymentRequest, Payment.class);
 		payment.setInvoice(invoice);
 		payment.setRentalCar(rentalCar);
@@ -184,6 +186,83 @@ public class PaymentManager implements PaymentService {
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<PaymentListDto>>(response, "Payments listed successfully.");
+	}
+
+	@Override
+	public Result payExtraForIndividualCustomer(PayExtraModel payExtraModel) {
+		if (posService.pay(payExtraModel.getCreatePosServiceRequest())) {
+
+			runExtraPaymentSuccessorForIndividiual(payExtraModel, payExtraModel.getRentalCarId());
+
+			return new SuccessResult("Payment successfull.");
+		}
+
+		return new ErrorResult("Payment is not successfull.");
+	}
+
+	@Override
+	public Result payExtraForCorporateCustomer(PayExtraModel payExtraModel) {
+		if (posService.pay(payExtraModel.getCreatePosServiceRequest())) {
+
+			runExtraPaymentSuccessorForCorporate(payExtraModel, payExtraModel.getRentalCarId());
+
+			return new SuccessResult("Payment successfull.");
+		}
+
+		return new ErrorResult("Payment is not successfull.");
+	}
+
+	@Transactional
+	public void runExtraPaymentSuccessorForIndividiual(PayExtraModel payExtraModel, int rentalCarId) {
+		GetRentalCarDto getRentalCarDto = rentalCarService.getById(rentalCarId).getData();
+		RentalCar rentalCar = this.modelMapperService.forRequest().map(getRentalCarDto, RentalCar.class);
+		List<InvoiceListDto> invoices = invoiceService.getbyRentalCarId(rentalCar.getId()).getData();
+
+		Double totalInvoicePrice = 0.0;
+
+		for (InvoiceListDto invoice : invoices) {
+			totalInvoicePrice += invoice.getTotalPrice();
+		}
+
+		Double difference = rentalCar.getTotalPrice() - totalInvoicePrice;
+
+		Invoice invoice = addInvoiceForIndividual(payExtraModel.getCreateInvoiceRequest(),
+				rentalCar.getCustomer().getId(), rentalCar, difference);
+		addPayment(payExtraModel.getCreatePaymentRequest(), invoice, rentalCar);
+
+		rentalCar.setEndDate(LocalDate.now());
+		rentalCar.setTotalRentDay(
+				rentalCarService.calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()));
+		rentalCar.setTotalPrice(rentalCarService.calculateTotalPrice(rentalCar.getCar().getId(),
+				rentalCar.getTotalRentDay(), rentalCar.getAdditionalPrice()));
+		rentalCarService.saveNewRentalCarAfterPayingExtra(rentalCar);
+	}
+
+	@Transactional
+	public void runExtraPaymentSuccessorForCorporate(PayExtraModel payExtraModel, int rentalCarId) {
+		GetRentalCarDto getRentalCarDto = rentalCarService.getById(rentalCarId).getData();
+		RentalCar rentalCar = this.modelMapperService.forRequest().map(getRentalCarDto, RentalCar.class);
+
+		List<InvoiceListDto> invoices = invoiceService.getbyRentalCarId(rentalCar.getId()).getData();
+
+		Double totalInvoicePrice = 0.0;
+
+		for (InvoiceListDto invoice : invoices) {
+			totalInvoicePrice += invoice.getTotalPrice();
+		}
+		Long newTotalRentDay = rentalCarService.calculateTotalRentDay(rentalCar.getStartingDate(), LocalDate.now());
+		Double newTotalPrice = rentalCarService.calculateTotalPrice(rentalCar.getCar().getId(), newTotalRentDay,
+				rentalCar.getAdditionalPrice());
+		Double difference = newTotalPrice - totalInvoicePrice;
+
+		Invoice invoice = addInvoiceForCorporate(payExtraModel.getCreateInvoiceRequest(),
+				rentalCar.getCustomer().getId(), rentalCar, difference);
+		addPayment(payExtraModel.getCreatePaymentRequest(), invoice, rentalCar);
+
+		rentalCar.setEndDate(LocalDate.now());
+		rentalCar.setTotalRentDay(newTotalRentDay);
+		rentalCar.setTotalPrice(newTotalPrice);
+		rentalCarService.saveNewRentalCarAfterPayingExtra(rentalCar);
 	}
 
 }

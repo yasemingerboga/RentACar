@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "rental_cars")
-public class RentalCar {
+public class RentalCar { 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "rental_car_id")
@@ -38,7 +37,7 @@ public class RentalCar {
 	private LocalDate endDate;
 
 	@Column(name = "total_rent_day")
-	private int totalRentDay;
+	private Long totalRentDay;
 
 	@Column(name = "total_price")
 	private Double totalPrice;
@@ -67,8 +66,8 @@ public class RentalCar {
 	@JoinColumn(name = "drop_off_city_id")
 	private City dropOffCity;
 
-	@OneToOne(mappedBy = "rentalCar")
-	private Invoice invoice;
+	@OneToMany(mappedBy = "rentalCar")
+	private List<Invoice> invoices;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")

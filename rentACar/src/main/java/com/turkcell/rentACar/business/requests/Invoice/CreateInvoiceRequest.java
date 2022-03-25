@@ -27,6 +27,6 @@ public class CreateInvoiceRequest {
 
 	private Double totalPrice;
 
-	private int totalRentDay;
+	private Long totalRentDay;
 
 }

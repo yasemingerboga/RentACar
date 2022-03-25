@@ -108,4 +108,15 @@ public class InvoiceManager implements InvoiceService {
 				"Invoices between start date and end date listed successfully.");
 	}
 
+	@Override
+	public DataResult<List<InvoiceListDto>> getbyRentalCarId(int id) {
+		List<Invoice> result = invoiceDao.getByRentalCar_Id(id);
+
+		List<InvoiceListDto> response = result.stream()
+				.map(color -> this.modelMapperService.forDto().map(color, InvoiceListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<List<InvoiceListDto>>(response, "Invoices listed successfully.");
+	}
+
 }

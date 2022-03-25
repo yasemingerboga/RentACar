@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.turkcell.rentACar.api.controllers.models.Payment.PayExtraModel;
 import com.turkcell.rentACar.api.controllers.models.Payment.PaymentModel;
 import com.turkcell.rentACar.business.abstracts.PaymentService;
 import com.turkcell.rentACar.business.dtos.Payment.PaymentListDto;
@@ -45,4 +46,15 @@ public class PaymentsController {
 	public DataResult<List<PaymentListDto>> getAll() {
 		return this.paymentService.getAll();
 	}
+
+	@PostMapping("/payExtraForIndividualCustomer")
+	Result payExtraForIndividualCustomer(@RequestBody @Valid PayExtraModel payExtraModel) {
+		return this.paymentService.payExtraForIndividualCustomer(payExtraModel);
+	}
+
+	@PostMapping("/payExtraForCorporateCustomer")
+	Result payExtraForCorporateCustomer(@RequestBody @Valid PayExtraModel payExtraModel) {
+		return this.paymentService.payExtraForCorporateCustomer(payExtraModel);
+	}
+
 }

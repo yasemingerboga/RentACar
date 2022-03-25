@@ -29,17 +29,16 @@ public class RentalCarListDto {
 
 	private GetCityDto dropOffCityDto;
 
-	private int totalRentDay;
+	private Long totalRentDay;
 
 	private Double totalPrice;
 
 	private List<OrderedAdditionalServiceListDto> orderedAdditionalServiceList;
-
-	private int invoiceId;
 
 	private int customerUserId;
 
 	private Double startingKilometer;
 
 	private Double endingKilometer;
+
 }

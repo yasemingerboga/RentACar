@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.business.abstracts;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.turkcell.rentACar.api.controllers.models.RentalCar.CreateRentalModel;
@@ -29,4 +30,9 @@ public interface RentalCarService {
 
 	Result endOfRent(EndOfRent endOfRent);
 
+	Long calculateTotalRentDay(LocalDate startingDate, LocalDate endDate);
+
+	Double calculateTotalPrice(int carId, Long totalRentDay, Double additionalPrice);
+
+	boolean saveNewRentalCarAfterPayingExtra(RentalCar rentalCar);
 }
