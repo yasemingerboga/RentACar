@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.IndividualCustomer.GetIndividualCustomerDto;
 import com.turkcell.rentACar.business.dtos.IndividualCustomer.IndividualCustomerListDto;
 import com.turkcell.rentACar.business.requests.IndividualCustomer.CreateIndividualCustomerRequest;
 import com.turkcell.rentACar.business.requests.IndividualCustomer.UpdateIndividualCustomerRequest;
+import com.turkcell.rentACar.core.utilities.exceptions.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
-import com.turkcell.rentACar.core.utilities.results.ErrorResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
 import com.turkcell.rentACar.core.utilities.results.SuccessDataResult;
 import com.turkcell.rentACar.core.utilities.results.SuccessResult;
@@ -35,52 +36,68 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
 	@Override
 	public Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) {
+
 		IndividualCustomer individualCustomer = this.modelMapperService.forRequest()
 				.map(createIndividualCustomerRequest, IndividualCustomer.class);
+
 		individualCustomerDao.save(individualCustomer);
-		return new SuccessResult("Individual customer added successfully.");
+
+		return new SuccessResult(BusinessMessages.INDIVIDUAL_SAVE_SUCCESSFULLY);
 
 	}
 
 	@Override
 	public Result delete(int id) {
+
+		checkIfIndividualCustomerExists(id);
+
 		this.individualCustomerDao.deleteById(id);
-		return new SuccessResult("Individual customer deleted successfully.");
+
+		return new SuccessResult(BusinessMessages.INDIVIDUAL_DELETE_SUCCESSFULLY);
 	}
 
 	@Override
 	public Result update(UpdateIndividualCustomerRequest updateIndividualCustomerRequest) {
+
+		checkIfIndividualCustomerExists(updateIndividualCustomerRequest.getId());
+
 		IndividualCustomer individualCustomer = this.modelMapperService.forRequest()
 				.map(updateIndividualCustomerRequest, IndividualCustomer.class);
+
 		individualCustomerDao.save(individualCustomer);
-		return new SuccessResult("Individual customer updated successfully.");
+
+		return new SuccessResult(BusinessMessages.INDIVIDUAL_UPDATE_SUCCESSFULLY);
 	}
 
 	@Override
 	public DataResult<GetIndividualCustomerDto> getById(int id) {
+
+		checkIfIndividualCustomerExists(id);
+
 		IndividualCustomer individualCustomer = this.individualCustomerDao.getById(id);
 		GetIndividualCustomerDto response = this.modelMapperService.forDto().map(individualCustomer,
 				GetIndividualCustomerDto.class);
-		return new SuccessDataResult<GetIndividualCustomerDto>(response, "Getting individual customer by id");
+
+		return new SuccessDataResult<GetIndividualCustomerDto>(response, BusinessMessages.INDIVIDUAL_GET_SUCCESSFULLY);
 	}
 
 	@Override
 	public DataResult<List<IndividualCustomerListDto>> getAll() {
+
 		List<IndividualCustomer> result = this.individualCustomerDao.findAll();
 		List<IndividualCustomerListDto> response = result.stream().map(individualCustomer -> this.modelMapperService
 				.forDto().map(individualCustomer, IndividualCustomerListDto.class)).collect(Collectors.toList());
+
 		return new SuccessDataResult<List<IndividualCustomerListDto>>(response,
-				"Individual customers listed successfully.");
+				BusinessMessages.INDIVIDUAL_LIST_SUCCESSFULLY);
 	}
 
 	@Override
-	public Result existById(int id) {
+	public void checkIfIndividualCustomerExists(int id) {
 
 		if (!individualCustomerDao.existsById(id)) {
 
-			return new ErrorResult("There is no individual customer found with specified id.");
+			throw new BusinessException(BusinessMessages.INDIVIDUAL_NOT_FOUND);
 		}
-
-		return new SuccessResult("Getting individual user successfully.");
 	}
 }

@@ -27,7 +27,7 @@ public interface CarService {
 
 	DataResult<List<CarListDto>> getAllSorted(String direction);
 
-	Result existsById(int id);
+	void checkIfCarExists(int id);
 
 	Result updateKilometer(int id, Double kilometer);
 }

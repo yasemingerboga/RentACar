@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.turkcell.rentACar.business.abstracts.InvoiceService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.Invoice.GetInvoiceDto;
 import com.turkcell.rentACar.business.dtos.Invoice.InvoiceListDto;
 import com.turkcell.rentACar.business.requests.Invoice.CreateInvoiceRequest;
 import com.turkcell.rentACar.business.requests.Invoice.UpdateInvoiceRequest;
+import com.turkcell.rentACar.core.utilities.exceptions.BusinessException;
 import com.turkcell.rentACar.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACar.core.utilities.results.DataResult;
 import com.turkcell.rentACar.core.utilities.results.Result;
@@ -43,7 +45,7 @@ public class InvoiceManager implements InvoiceService {
 				.map(color -> this.modelMapperService.forDto().map(color, InvoiceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<InvoiceListDto>>(response, "Invoices listed successfully.");
+		return new SuccessDataResult<List<InvoiceListDto>>(response, BusinessMessages.INVOICE_LIST_SUCCESSFULLY);
 	}
 
 	@Override
@@ -51,37 +53,44 @@ public class InvoiceManager implements InvoiceService {
 	public DataResult<Invoice> add(CreateInvoiceRequest createInvoiceRequest) {
 
 		Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
+
 		Invoice savedInvoice = this.invoiceDao.save(invoice);
 
-		return new SuccessDataResult<Invoice>(savedInvoice, "Invoice added successfully.");
+		return new SuccessDataResult<Invoice>(savedInvoice, BusinessMessages.INVOICE_SAVE_SUCCESSFULLY);
 	}
 
 	@Override
 	public DataResult<GetInvoiceDto> getById(int id) {
 
+		checkIfInvoiceExists(id);
+
 		Invoice invoice = invoiceDao.getById(id);
 
 		GetInvoiceDto response = this.modelMapperService.forDto().map(invoice, GetInvoiceDto.class);
 
-		return new SuccessDataResult<GetInvoiceDto>(response, "Getting invoice by id");
+		return new SuccessDataResult<GetInvoiceDto>(response, BusinessMessages.INVOICE_GET_SUCCESSFULLY);
 	}
 
 	@Override
 	public Result delete(int id) {
 
+		checkIfInvoiceExists(id);
+
 		this.invoiceDao.deleteById(id);
 
-		return new SuccessResult("Invoice deleted successfully.");
+		return new SuccessResult(BusinessMessages.INVOICE_DELETE_SUCCESSFULLY);
 	}
 
 	@Override
 	public Result update(UpdateInvoiceRequest updateInvoiceRequest) {
 
+		checkIfInvoiceExists(updateInvoiceRequest.getId());
+
 		Invoice invoice = this.modelMapperService.forRequest().map(updateInvoiceRequest, Invoice.class);
 
 		this.invoiceDao.save(invoice);
 
-		return new SuccessResult("Invoice updated successfully.");
+		return new SuccessResult(BusinessMessages.INVOICE_UPDATE_SUCCESSFULLY);
 	}
 
 	@Override
@@ -93,7 +102,7 @@ public class InvoiceManager implements InvoiceService {
 				.map(color -> this.modelMapperService.forDto().map(color, InvoiceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<InvoiceListDto>>(response, "Invoices listed successfully.");
+		return new SuccessDataResult<List<InvoiceListDto>>(response, BusinessMessages.INVOICE_LIST_SUCCESSFULLY);
 	}
 
 	@Override
@@ -104,19 +113,25 @@ public class InvoiceManager implements InvoiceService {
 				.map(invoice -> modelMapperService.forDto().map(invoice, InvoiceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<InvoiceListDto>>(response,
-				"Invoices between start date and end date listed successfully.");
+		return new SuccessDataResult<List<InvoiceListDto>>(response, BusinessMessages.INVOICE_LIST_SUCCESSFULLY);
 	}
 
 	@Override
 	public DataResult<List<InvoiceListDto>> getbyRentalCarId(int id) {
-		List<Invoice> result = invoiceDao.getByRentalCar_Id(id);
 
+		List<Invoice> result = invoiceDao.getByRentalCar_Id(id);
 		List<InvoiceListDto> response = result.stream()
 				.map(color -> this.modelMapperService.forDto().map(color, InvoiceListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<InvoiceListDto>>(response, "Invoices listed successfully.");
+		return new SuccessDataResult<List<InvoiceListDto>>(response, BusinessMessages.INVOICE_LIST_SUCCESSFULLY);
+	}
+
+	private void checkIfInvoiceExists(int id) {
+
+		if (!invoiceDao.existsById(id)) {
+			throw new BusinessException(BusinessMessages.INVOICE_NOT_FOUND);
+		}
 	}
 
 }

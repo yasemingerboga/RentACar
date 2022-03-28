@@ -20,5 +20,5 @@ public interface AdditionalServiceService {
 
 	Result update(UpdateAdditionalServiceRequest updateAdditionalServiceRequest);
 
-	Result existById(int id);
+	void checkIfAdditionalServiceExists(int id);
 }

@@ -17,6 +17,7 @@ import com.turkcell.rentACar.business.abstracts.InvoiceService;
 import com.turkcell.rentACar.business.abstracts.PaymentService;
 import com.turkcell.rentACar.business.abstracts.PosService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.CorporateCustomer.GetCorporateCustomerDto;
 import com.turkcell.rentACar.business.dtos.IndividualCustomer.GetIndividualCustomerDto;
 import com.turkcell.rentACar.business.dtos.Invoice.InvoiceListDto;
@@ -70,10 +71,10 @@ public class PaymentManager implements PaymentService {
 
 			runPaymentSuccessorForIndividiual(paymentModel);
 
-			return new SuccessResult("Payment successfull.");
+			return new SuccessResult(BusinessMessages.PAYMENT_SAVE_SUCCESSFULLY);
 		}
 
-		return new ErrorResult("Payment is not successfull.");
+		return new ErrorResult(BusinessMessages.PAYMENT_SAVE_UNSUCCESSFULLY);
 	}
 
 	@Override
@@ -83,57 +84,59 @@ public class PaymentManager implements PaymentService {
 
 			runPaymentSuccessorForCorporate(paymentModel);
 
-			return new SuccessResult("Payment successfull.");
+			return new SuccessResult(BusinessMessages.PAYMENT_SAVE_SUCCESSFULLY);
 		}
 
-		return new ErrorResult("Payment is not successfull.");
+		return new ErrorResult(BusinessMessages.PAYMENT_SAVE_UNSUCCESSFULLY);
 	}
 
 	@Transactional
 	public void runPaymentSuccessorForIndividiual(PaymentModel paymentModel) {
 		RentalCar rentalCar = addRentalForIndividualCustomer(paymentModel.getCreateRentalModel());
+
 		Invoice invoice = addInvoiceForIndividual(paymentModel.getCreateInvoiceRequest(),
 				paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId(), rentalCar,
 				rentalCar.getTotalPrice());
+
 		addPayment(paymentModel.getCreatePaymentRequest(), invoice, rentalCar);
 	}
 
 	@Transactional
 	public void runPaymentSuccessorForCorporate(PaymentModel paymentModel) {
+
 		RentalCar rentalCar = addRentalForCorporateCustomer(paymentModel.getCreateRentalModel());
+
 		Invoice invoice = addInvoiceForCorporate(paymentModel.getCreateInvoiceRequest(),
 				paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId(), rentalCar,
 				rentalCar.getTotalPrice());
+
 		addPayment(paymentModel.getCreatePaymentRequest(), invoice, rentalCar);
 	}
 
-	@Transactional
 	private RentalCar addRentalForCorporateCustomer(CreateRentalModel createRentalModel) {
+
 		return rentalCarService.addForCorporateCustomer(createRentalModel).getData();
 	}
 
-	@Transactional
 	private RentalCar addRentalForIndividualCustomer(CreateRentalModel createRentalModel) {
+
 		return rentalCarService.addForIndividualCustomer(createRentalModel).getData();
 	}
 
-	@Transactional
 	private Invoice addInvoiceForIndividual(CreateInvoiceRequestForPayment createInvoiceRequestForPayment,
 			int customerId, RentalCar rentalCar, Double totalPrice) {
+
 		Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequestForPayment, Invoice.class);
 
-		invoice.setCreationDate(LocalDate.now());
 		GetIndividualCustomerDto customer = individualCustomerService.getById(customerId).getData();
 		IndividualCustomer individualCustomer = this.modelMapperService.forRequest().map(customer,
 				IndividualCustomer.class);
 
+		invoice.setCreationDate(LocalDate.now());
 		invoice.setCustomer(individualCustomer);
-
 		invoice.setInvoiceNumber("123");
-
 		invoice.setRentalCar(rentalCar);
 		invoice.setTotalPrice(totalPrice);
-
 		invoice.setTotalRentDay(rentalCar.getTotalRentDay());
 		invoice.setStartDate(rentalCar.getStartingDate());
 		invoice.setEndDate(rentalCar.getEndDate());
@@ -143,21 +146,18 @@ public class PaymentManager implements PaymentService {
 		return invoiceService.add(createInvoiceRequestUpdated).getData();
 	}
 
-	@Transactional
 	private Invoice addInvoiceForCorporate(CreateInvoiceRequestForPayment createInvoiceRequestForPayment,
 			int customerId, RentalCar rentalCar, Double totalPrice) {
-		Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequestForPayment, Invoice.class);
 
-		invoice.setCreationDate(LocalDate.now());
+		Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequestForPayment, Invoice.class);
 
 		GetCorporateCustomerDto customer = corporateCustomerService.getById(customerId).getData();
 		CorporateCustomer corporateCustomer = this.modelMapperService.forRequest().map(customer,
 				CorporateCustomer.class);
 
+		invoice.setCreationDate(LocalDate.now());
 		invoice.setCustomer(corporateCustomer);
-
 		invoice.setInvoiceNumber("123");
-
 		invoice.setRentalCar(rentalCar);
 		invoice.setTotalPrice(totalPrice);
 		invoice.setTotalRentDay(rentalCar.getTotalRentDay());
@@ -166,14 +166,18 @@ public class PaymentManager implements PaymentService {
 
 		CreateInvoiceRequest createInvoiceRequestUpdated = this.modelMapperService.forDto().map(invoice,
 				CreateInvoiceRequest.class);
+
 		return invoiceService.add(createInvoiceRequestUpdated).getData();
 	}
 
-	@Transactional
 	private Payment addPayment(CreatePaymentRequest createPaymentRequest, Invoice invoice, RentalCar rentalCar) {
+
 		Payment payment = this.modelMapperService.forRequest().map(createPaymentRequest, Payment.class);
+
 		payment.setInvoice(invoice);
+
 		payment.setRentalCar(rentalCar);
+
 		return paymentDao.save(payment);
 	}
 
@@ -185,7 +189,7 @@ public class PaymentManager implements PaymentService {
 				.map(payment -> this.modelMapperService.forDto().map(payment, PaymentListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<PaymentListDto>>(response, "Payments listed successfully.");
+		return new SuccessDataResult<List<PaymentListDto>>(response, BusinessMessages.PAYMENT_LIST_SUCCESSFULLY);
 	}
 
 	@Override
@@ -194,10 +198,10 @@ public class PaymentManager implements PaymentService {
 
 			runExtraPaymentSuccessorForIndividiual(payExtraModel, payExtraModel.getRentalCarId());
 
-			return new SuccessResult("Payment successfull.");
+			return new SuccessResult(BusinessMessages.PAYMENT_SAVE_SUCCESSFULLY);
 		}
 
-		return new ErrorResult("Payment is not successfull.");
+		return new ErrorResult(BusinessMessages.PAYMENT_SAVE_UNSUCCESSFULLY);
 	}
 
 	@Override
@@ -206,10 +210,10 @@ public class PaymentManager implements PaymentService {
 
 			runExtraPaymentSuccessorForCorporate(payExtraModel, payExtraModel.getRentalCarId());
 
-			return new SuccessResult("Payment successfull.");
+			return new SuccessResult(BusinessMessages.PAYMENT_SAVE_SUCCESSFULLY);
 		}
 
-		return new ErrorResult("Payment is not successfull.");
+		return new ErrorResult(BusinessMessages.PAYMENT_SAVE_UNSUCCESSFULLY);
 	}
 
 	@Transactional

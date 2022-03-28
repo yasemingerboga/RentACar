@@ -75,21 +75,26 @@ public class RentalCarManager implements RentalCarService {
 				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<RentalCarListDto>>(responseList, "Rental cars listed successfully.");
+		return new SuccessDataResult<List<RentalCarListDto>>(responseList,
+				BusinessMessages.RENTAL_CAR_LIST_SUCCESSFULLY);
 	}
 
 	@Override
 	public DataResult<GetRentalCarDto> getById(int id) {
 
+		checkIfRentalCarExists(id);
+
 		RentalCar result = this.rentalCarDao.getById(id);
 
 		GetRentalCarDto response = this.modelMapperService.forDto().map(result, GetRentalCarDto.class);
 
-		return new SuccessDataResult<GetRentalCarDto>(response, "Rental car has been received successfully.");
+		return new SuccessDataResult<GetRentalCarDto>(response, BusinessMessages.RENTAL_CAR_GET_SUCCESSFULLY);
 	}
 
 	@Override
 	public DataResult<List<RentalCarListDto>> getByCarId(int carId) {
+
+		checkIfCarExists(carId);
 
 		List<RentalCar> result = this.rentalCarDao.getByCar_Id(carId);
 
@@ -97,7 +102,7 @@ public class RentalCarManager implements RentalCarService {
 				.map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<RentalCarListDto>>(response, "Rental cars listed successfully.");
+		return new SuccessDataResult<List<RentalCarListDto>>(response, BusinessMessages.RENTAL_CAR_LIST_SUCCESSFULLY);
 	}
 
 	@Override
@@ -135,11 +140,13 @@ public class RentalCarManager implements RentalCarService {
 
 		RentalCar savedRentalCar = this.rentalCarDao.save(rentalCar);
 
-		return new SuccessDataResult<RentalCar>(savedRentalCar, "Rental car saved successfully.");
+		return new SuccessDataResult<RentalCar>(savedRentalCar, BusinessMessages.RENTAL_CAR_SAVE_SUCCESSFULLY);
 	}
 
 	public Double calculateTotalPrice(int carId, Long totalRentDay, Double additionalPrice) {
+
 		Double dailyPrice = carService.getById(carId).getData().getDailyPrice();
+
 		return additionalPrice + (dailyPrice * totalRentDay);
 	}
 
@@ -176,21 +183,15 @@ public class RentalCarManager implements RentalCarService {
 
 		RentalCar savedRentalCar = this.rentalCarDao.save(rentalCar);
 
-		return new SuccessDataResult<RentalCar>(savedRentalCar, "Rental car saved successfully.");
+		return new SuccessDataResult<RentalCar>(savedRentalCar, BusinessMessages.RENTAL_CAR_SAVE_SUCCESSFULLY);
 	}
 
 	private void checkIfIndividualCustomerExists(int id) {
-		if (!individualCustomerService.existById(id).isSuccess()) {
-			throw new BusinessException("There is no individual customer with the specified id.");
-		}
+		individualCustomerService.checkIfIndividualCustomerExists(id);
 	}
 
 	private void checkIfCorporateCustomerExists(int id) {
-
-		if (!corporateCustomerService.existById(id).isSuccess()) {
-
-			throw new BusinessException(BusinessMessages.CORPORATE_NOT_FOUND);
-		}
+		corporateCustomerService.checkIfCorporateCustomerExists(id);
 	}
 
 	private List<OrderedAdditionalService> mappingOrderedAdditionalService(
@@ -202,6 +203,7 @@ public class RentalCarManager implements RentalCarService {
 			orderedAdditionalServices.get(i).setId(0);
 			orderedAdditionalServices.get(i).setRentalCar(rentalCar);
 		}
+
 		return orderedAdditionalServices;
 	}
 
@@ -209,7 +211,8 @@ public class RentalCarManager implements RentalCarService {
 
 		for (OrderedAdditionalService orderedAdditionalService : orderedAdditionalServices) {
 
-			additionalServiceService.existById(orderedAdditionalService.getAdditionalService().getId());
+			additionalServiceService
+					.checkIfAdditionalServiceExists(orderedAdditionalService.getAdditionalService().getId());
 		}
 	}
 
@@ -219,6 +222,7 @@ public class RentalCarManager implements RentalCarService {
 
 			rentalCar.setAdditionalPrice(750.0);
 		}
+
 		return rentalCar;
 	}
 
@@ -252,12 +256,12 @@ public class RentalCarManager implements RentalCarService {
 					&& (rentalCar.getStartingDate().isBefore(carMaintenanceDto.getReturnDate())
 							|| rentalCar.getEndDate().isBefore(carMaintenanceDto.getReturnDate()))) {
 
-				throw new BusinessException("This car cannot be rented as it is under maintenance.");
+				throw new BusinessException(BusinessMessages.CAR_CANNOT_RENT_BECAUSE_MAINTENANCE);
 			}
+
 			if (carMaintenanceDto.getReturnDate() == null) {
 
-				throw new BusinessException(
-						"This car cannot be rented as it is under maintenance / return date equals null.");
+				throw new BusinessException(BusinessMessages.RENTAL_CAR_CANNOT_BEACUSE_MAINTENANCE_OR_NULL_DATE);
 			}
 		}
 	}
@@ -269,11 +273,14 @@ public class RentalCarManager implements RentalCarService {
 		if (rentalCarList == null) {
 			return;
 		}
+
 		for (RentalCar rental : rentalCarList) {
+
 			if (rentalCar.getId() != rental.getId()) {
+
 				if (rentalCar.getStartingDate().isBefore(rental.getEndDate())
 						&& rentalCar.getStartingDate().isAfter(rental.getStartingDate())) {
-					throw new BusinessException("This car is rented already.");
+					throw new BusinessException(BusinessMessages.RENTED_ALREADY);
 				}
 			}
 
@@ -283,6 +290,8 @@ public class RentalCarManager implements RentalCarService {
 
 	@Override
 	public Result update(UpdateRentalModel updateRentalModel) {
+
+		checkIfRentalCarExists(updateRentalModel.getUpdateRentalCarRequest().getId());
 
 		orderedAdditionalServiceService.deleteByRentalCarId(updateRentalModel.getUpdateRentalCarRequest().getId());
 
@@ -310,17 +319,14 @@ public class RentalCarManager implements RentalCarService {
 
 		updatedRentalCar.setTotalPrice(calculateTotalPrice(updatedRentalCar.getCar().getId(),
 				updatedRentalCar.getTotalRentDay(), updatedRentalCar.getAdditionalPrice()));
+
 		this.rentalCarDao.save(updatedRentalCar);
 
-		return new SuccessResult("Rental car is updated.");
+		return new SuccessResult(BusinessMessages.RENTAL_CAR_UPDATE_SUCCESSFULLY);
 	}
 
 	public void checkIfCarExists(int carId) {
-
-		if (!carService.existsById(carId).isSuccess()) {
-
-			throw new BusinessException("There is no car with the specified id.");
-		}
+		carService.checkIfCarExists(carId);
 	}
 
 	@Override
@@ -330,15 +336,13 @@ public class RentalCarManager implements RentalCarService {
 
 		this.rentalCarDao.deleteById(id);
 
-		return new SuccessResult("Deleted successfully.");
+		return new SuccessResult(BusinessMessages.RENTAL_CAR_DELETE_SUCCESSFULLY);
 	}
 
 	public void checkIfRentalCarExists(int rentalCarId) {
 
 		if (!rentalCarDao.existsById(rentalCarId)) {
-
-			throw new BusinessException("There is no rental car with the specified id.");
-
+			throw new BusinessException(BusinessMessages.RENTAL_CAR_NOT_FOUND);
 		}
 	}
 
@@ -360,6 +364,7 @@ public class RentalCarManager implements RentalCarService {
 		rentalCarDao.save(rentalCar);
 
 		if (!checkIfIsRightTime(rentalCar)) {
+
 			List<InvoiceListDto> invoices = invoiceService.getbyRentalCarId(rentalCar.getId()).getData();
 
 			Double totalInvoicePrice = 0.0;
@@ -367,17 +372,20 @@ public class RentalCarManager implements RentalCarService {
 			for (InvoiceListDto invoice : invoices) {
 				totalInvoicePrice += invoice.getTotalPrice();
 			}
+
 			Double difference = calculateTotalPrice(rentalCar.getCar().getId(),
 					calculateTotalRentDay(rentalCar.getStartingDate(), LocalDate.now()), rentalCar.getAdditionalPrice())
 					- totalInvoicePrice;
+
 			return new ErrorResult("You should pay extra " + difference.toString() + " liras.");
 		}
 
-		return new SuccessResult("Rent ends.");
+		return new SuccessResult(BusinessMessages.RENTAL_ENDS_SUCCESSFULLY);
 
 	}
 
 	private boolean checkIfIsRightTime(RentalCar rentalCar) {
+
 		if (!rentalCar.getEndDate().equals(LocalDate.now())) {
 			return false;
 		}
@@ -386,11 +394,14 @@ public class RentalCarManager implements RentalCarService {
 
 	@Override
 	public boolean saveNewRentalCarAfterPayingExtra(RentalCar rentalCar) {
+
 		rentalCar.setEndDate(LocalDate.now());
 		rentalCar.setTotalRentDay(calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()));
 		rentalCar.setTotalPrice(calculateTotalPrice(rentalCar.getCar().getId(), rentalCar.getTotalRentDay(),
 				rentalCar.getAdditionalPrice()));
+
 		rentalCarDao.save(rentalCar);
+
 		return true;
 	}
 }

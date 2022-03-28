@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCarDamageRequest {
+	@Positive
+	private int id;
 	@Size(min = 4)
 	private String description;
 	@Positive

@@ -20,5 +20,5 @@ public interface IndividualCustomerService {
 
 	DataResult<List<IndividualCustomerListDto>> getAll();
 
-	Result existById(int id);
+	void checkIfIndividualCustomerExists(int id);
 }

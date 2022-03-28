@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.turkcell.rentACar.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACar.business.abstracts.CarService;
 import com.turkcell.rentACar.business.abstracts.RentalCarService;
-import com.turkcell.rentACar.business.dtos.Car.GetCarDto;
+import com.turkcell.rentACar.business.constants.messages.BusinessMessages;
 import com.turkcell.rentACar.business.dtos.CarMaintenance.CarMaintenanceListDto;
 import com.turkcell.rentACar.business.dtos.CarMaintenance.GetCarMaintenanceDto;
 import com.turkcell.rentACar.business.dtos.RentalCar.RentalCarListDto;
@@ -45,79 +45,109 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
 	@Override
 	public DataResult<List<CarMaintenanceListDto>> getAll() {
+
 		List<CarMaintenance> result = this.carMaintenanceDao.findAll();
 		List<CarMaintenanceListDto> response = result.stream().map(
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenances listed successfully.");
+
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response,
+				BusinessMessages.CAR_MAINTENANCE_LIST_SUCCESSFULLY);
 	}
 
 	@Override
 	public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) {
-		checkIfCarIsAvaliable(createCarMaintenanceRequest.getCarId());
+
+		checkIfCarExists(createCarMaintenanceRequest.getCarId());
 
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest,
 				CarMaintenance.class);
+
 		checkIfIsRent(carMaintenance);
+
 		carMaintenanceDao.save(carMaintenance);
-		return new SuccessResult("Car maintenance added successfully.");
+
+		return new SuccessResult(BusinessMessages.CAR_MAINTENANCE_SAVE_SUCCESSFULLY);
 	}
 
-	private void checkIfCarIsAvaliable(int id) {
-		DataResult<GetCarDto> result = this.carService.getById(id);
-		if (!result.isSuccess()) {
-			throw new BusinessException("The car with this id does not exist.");
-		}
+	private void checkIfCarExists(int id) {
+		carService.checkIfCarExists(id);
 	}
 
 	private boolean checkIfIsRent(CarMaintenance carMaintenance) {
+
 		List<RentalCarListDto> result = this.rentalCarService.getByCarId(carMaintenance.getCar().getId()).getData();
 		if (result == null) {
 			return true;
 		}
+
 		for (RentalCarListDto rentalCar : result) {
 			if ((rentalCar.getEndDate() != null) && (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
 					&& carMaintenance.getReturnDate().isBefore(rentalCar.getEndDate()))) {
-				throw new BusinessException("The car cannot be sent for maintenance because it is on rent.");
+				throw new BusinessException(BusinessMessages.CAR_MAINTENANCE_CANNOT_BECAUSE_RENT);
 			}
 			if ((rentalCar.getEndDate() == null) && (carMaintenance.getReturnDate().isAfter(rentalCar.getStartingDate())
 					|| carMaintenance.getReturnDate().equals(rentalCar.getStartingDate()))) {
-				throw new BusinessException(
-						"The car cannot be sent for maintenance because it is on rent. / null end date.");
+				throw new BusinessException(BusinessMessages.CAR_MAINTENANCE_CANNOT_BEACUSE_RENT_OR_NULL_DATE);
 			}
 		}
+
 		return true;
 	}
 
 	@Override
 	public DataResult<GetCarMaintenanceDto> getById(int id) {
+
+		checkIfCarMaintenanceExists(id);
+
 		CarMaintenance carMaintenance = this.carMaintenanceDao.findById(id);
 		GetCarMaintenanceDto response = this.modelMapperService.forDto().map(carMaintenance,
 				GetCarMaintenanceDto.class);
-		return new SuccessDataResult<GetCarMaintenanceDto>(response, "Getting car maintenance by id.");
+
+		return new SuccessDataResult<GetCarMaintenanceDto>(response, BusinessMessages.CAR_MAINTENANCE_GET_SUCCESSFULLY);
 	}
 
 	@Override
 	public Result delete(int id) {
+
+		checkIfCarMaintenanceExists(id);
+
 		this.carMaintenanceDao.deleteById(id);
-		return new SuccessResult("Car maintenance deleted successfully.");
+
+		return new SuccessResult(BusinessMessages.CAR_MAINTENANCE_DELETE_SUCCESSFULLY);
 	}
 
 	@Override
 	public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) {
+
+		checkIfCarMaintenanceExists(updateCarMaintenanceRequest.getCarMaintenanceId());
+
 		CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest,
 				CarMaintenance.class);
+
 		carMaintenanceDao.save(carMaintenance);
-		return new SuccessResult("Car maintenance updated successfully.");
+
+		return new SuccessResult(BusinessMessages.CAR_MAINTENANCE_UPDATE_SUCCESSFULLY);
 	}
 
 	@Override
 	public DataResult<List<CarMaintenanceListDto>> getByCarId(int carId) {
+
 		List<CarMaintenance> result = this.carMaintenanceDao.findByCar_Id(carId);
+
 		List<CarMaintenanceListDto> response = result.stream().map(
 				carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
 				.collect(Collectors.toList());
-		return new SuccessDataResult<List<CarMaintenanceListDto>>(response, "Car maintenances listed successfully.");
+
+		return new SuccessDataResult<List<CarMaintenanceListDto>>(response,
+				BusinessMessages.CAR_MAINTENANCE_LIST_SUCCESSFULLY);
+	}
+
+	private void checkIfCarMaintenanceExists(int id) {
+
+		if (!carMaintenanceDao.existsById(id)) {
+			throw new BusinessException(BusinessMessages.CAR_MAINTENANCE_NOT_FOUND);
+		}
 	}
 
 }

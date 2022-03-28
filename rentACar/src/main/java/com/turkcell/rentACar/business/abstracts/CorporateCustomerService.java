@@ -20,5 +20,5 @@ public interface CorporateCustomerService {
 
 	DataResult<List<CorporateCustomerListDto>> getAll();
 
-	Result existById(int id);
+	void checkIfCorporateCustomerExists(int id);
 }
