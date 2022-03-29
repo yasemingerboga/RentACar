@@ -234,9 +234,12 @@ public class PaymentManager implements PaymentService {
 				rentalCar.getCustomer().getId(), rentalCar, difference);
 		addPayment(payExtraModel.getCreatePaymentRequest(), invoice, rentalCar);
 
-		rentalCar.setEndDate(LocalDate.now());
-		rentalCar.setTotalRentDay(
-				rentalCarService.calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()));
+		if (!rentalCarService.checkIfIsRightTime(rentalCar)) {
+			rentalCar.setEndDate(LocalDate.now());
+			rentalCar.setTotalRentDay(
+					rentalCarService.calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()));
+		}
+
 		rentalCar.setTotalPrice(rentalCarService.calculateTotalPrice(rentalCar.getCar().getId(),
 				rentalCar.getTotalRentDay(), rentalCar.getAdditionalPrice()));
 		rentalCarService.saveNewRentalCarAfterPayingExtra(rentalCar);
@@ -254,18 +257,21 @@ public class PaymentManager implements PaymentService {
 		for (InvoiceListDto invoice : invoices) {
 			totalInvoicePrice += invoice.getTotalPrice();
 		}
-		Long newTotalRentDay = rentalCarService.calculateTotalRentDay(rentalCar.getStartingDate(), LocalDate.now());
-		Double newTotalPrice = rentalCarService.calculateTotalPrice(rentalCar.getCar().getId(), newTotalRentDay,
-				rentalCar.getAdditionalPrice());
-		Double difference = newTotalPrice - totalInvoicePrice;
+
+		Double difference = rentalCar.getTotalPrice() - totalInvoicePrice;
 
 		Invoice invoice = addInvoiceForCorporate(payExtraModel.getCreateInvoiceRequest(),
 				rentalCar.getCustomer().getId(), rentalCar, difference);
+
 		addPayment(payExtraModel.getCreatePaymentRequest(), invoice, rentalCar);
 
-		rentalCar.setEndDate(LocalDate.now());
-		rentalCar.setTotalRentDay(newTotalRentDay);
-		rentalCar.setTotalPrice(newTotalPrice);
+		if (!rentalCarService.checkIfIsRightTime(rentalCar)) {
+			rentalCar.setEndDate(LocalDate.now());
+			rentalCar.setTotalRentDay(
+					rentalCarService.calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()));
+		}
+		rentalCar.setTotalPrice(rentalCarService.calculateTotalPrice(rentalCar.getCar().getId(),
+				rentalCar.getTotalRentDay(), rentalCar.getAdditionalPrice()));
 		rentalCarService.saveNewRentalCarAfterPayingExtra(rentalCar);
 	}
 

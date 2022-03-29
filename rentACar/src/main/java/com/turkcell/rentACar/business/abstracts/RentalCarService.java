@@ -35,4 +35,6 @@ public interface RentalCarService {
 	Double calculateTotalPrice(int carId, Long totalRentDay, Double additionalPrice);
 
 	boolean saveNewRentalCarAfterPayingExtra(RentalCar rentalCar);
+
+	public boolean checkIfIsRightTime(RentalCar rentalCar);
 }

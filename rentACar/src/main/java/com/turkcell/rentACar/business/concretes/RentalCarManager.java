@@ -320,6 +320,9 @@ public class RentalCarManager implements RentalCarService {
 		updatedRentalCar.setTotalPrice(calculateTotalPrice(updatedRentalCar.getCar().getId(),
 				updatedRentalCar.getTotalRentDay(), updatedRentalCar.getAdditionalPrice()));
 
+		updatedRentalCar
+				.setStartingKilometer(carService.getById(updatedRentalCar.getCar().getId()).getData().getKilometer());
+
 		this.rentalCarDao.save(updatedRentalCar);
 
 		return new SuccessResult(BusinessMessages.RENTAL_CAR_UPDATE_SUCCESSFULLY);
@@ -363,33 +366,37 @@ public class RentalCarManager implements RentalCarService {
 
 		rentalCarDao.save(rentalCar);
 
+		List<InvoiceListDto> invoices = invoiceService.getbyRentalCarId(rentalCar.getId()).getData();
+
+		Double totalInvoicePrice = 0.0;
+
+		for (InvoiceListDto invoice : invoices) {
+			totalInvoicePrice += invoice.getTotalPrice();
+		}
+		Double difference = 0.0;
 		if (!checkIfIsRightTime(rentalCar)) {
-
-			List<InvoiceListDto> invoices = invoiceService.getbyRentalCarId(rentalCar.getId()).getData();
-
-			Double totalInvoicePrice = 0.0;
-
-			for (InvoiceListDto invoice : invoices) {
-				totalInvoicePrice += invoice.getTotalPrice();
-			}
-
-			Double difference = calculateTotalPrice(rentalCar.getCar().getId(),
+			difference = calculateTotalPrice(rentalCar.getCar().getId(),
 					calculateTotalRentDay(rentalCar.getStartingDate(), LocalDate.now()), rentalCar.getAdditionalPrice())
 					- totalInvoicePrice;
+		} else {
+			difference = calculateTotalPrice(rentalCar.getCar().getId(),
+					calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()),
+					rentalCar.getAdditionalPrice()) - totalInvoicePrice;
+		}
+
+		if (difference > 0) {
 
 			return new ErrorResult("You should pay extra " + difference.toString() + " liras.");
 		}
 
+		if (difference < 0) {
+
+			difference = Math.abs(difference);
+			return new ErrorResult("The campany will pay extra " + difference.toString() + " liras to you.");
+		}
+
 		return new SuccessResult(BusinessMessages.RENTAL_ENDS_SUCCESSFULLY);
 
-	}
-
-	private boolean checkIfIsRightTime(RentalCar rentalCar) {
-
-		if (!rentalCar.getEndDate().equals(LocalDate.now())) {
-			return false;
-		}
-		return true;
 	}
 
 	@Override
@@ -402,6 +409,15 @@ public class RentalCarManager implements RentalCarService {
 
 		rentalCarDao.save(rentalCar);
 
+		return true;
+	}
+
+	@Override
+	public boolean checkIfIsRightTime(RentalCar rentalCar) {
+
+		if (!rentalCar.getEndDate().equals(LocalDate.now())) {
+			return false;
+		}
 		return true;
 	}
 }
