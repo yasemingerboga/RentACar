@@ -239,7 +239,6 @@ public class PaymentManager implements PaymentService {
 			rentalCar.setTotalRentDay(
 					rentalCarService.calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()));
 		}
-
 		rentalCar.setTotalPrice(rentalCarService.calculateTotalPrice(rentalCar.getCar().getId(),
 				rentalCar.getTotalRentDay(), rentalCar.getAdditionalPrice()));
 		rentalCarService.saveNewRentalCarAfterPayingExtra(rentalCar);

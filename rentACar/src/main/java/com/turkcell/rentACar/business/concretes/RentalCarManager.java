@@ -401,12 +401,6 @@ public class RentalCarManager implements RentalCarService {
 
 	@Override
 	public boolean saveNewRentalCarAfterPayingExtra(RentalCar rentalCar) {
-
-		rentalCar.setEndDate(LocalDate.now());
-		rentalCar.setTotalRentDay(calculateTotalRentDay(rentalCar.getStartingDate(), rentalCar.getEndDate()));
-		rentalCar.setTotalPrice(calculateTotalPrice(rentalCar.getCar().getId(), rentalCar.getTotalRentDay(),
-				rentalCar.getAdditionalPrice()));
-
 		rentalCarDao.save(rentalCar);
 
 		return true;
