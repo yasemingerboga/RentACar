@@ -19,8 +19,4 @@ public class PayExtraModel {
 	private CreatePosServiceRequest createPosServiceRequest;
 	@Positive
 	private int rentalCarId;
-	
-	private CreateInvoiceRequestForPayment createInvoiceRequest;
-
-	private CreatePaymentRequest createPaymentRequest;
 }

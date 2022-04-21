@@ -21,8 +21,4 @@ public class PaymentModel {
 
 	@NotNull
 	private CreateRentalModel createRentalModel;
-
-	private CreateInvoiceRequestForPayment createInvoiceRequest;
-
-	private CreatePaymentRequest createPaymentRequest;
 }

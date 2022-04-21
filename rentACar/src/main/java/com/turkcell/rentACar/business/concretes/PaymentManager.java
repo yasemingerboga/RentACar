@@ -93,12 +93,12 @@ public class PaymentManager implements PaymentService {
 	@Transactional
 	public void runPaymentSuccessorForIndividiual(PaymentModel paymentModel) {
 		RentalCar rentalCar = addRentalForIndividualCustomer(paymentModel.getCreateRentalModel());
-
-		Invoice invoice = addInvoiceForIndividual(paymentModel.getCreateInvoiceRequest(),
+		CreateInvoiceRequestForPayment createInvoiceRequestForPayment = new CreateInvoiceRequestForPayment();
+		Invoice invoice = addInvoiceForIndividual(createInvoiceRequestForPayment,
 				paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId(), rentalCar,
 				rentalCar.getTotalPrice());
-
-		addPayment(paymentModel.getCreatePaymentRequest(), invoice, rentalCar);
+		CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
+		addPayment(createPaymentRequest, invoice, rentalCar);
 	}
 
 	@Transactional
@@ -106,11 +106,13 @@ public class PaymentManager implements PaymentService {
 
 		RentalCar rentalCar = addRentalForCorporateCustomer(paymentModel.getCreateRentalModel());
 
-		Invoice invoice = addInvoiceForCorporate(paymentModel.getCreateInvoiceRequest(),
+		CreateInvoiceRequestForPayment createInvoiceRequestForPayment = new CreateInvoiceRequestForPayment();
+		Invoice invoice = addInvoiceForCorporate(createInvoiceRequestForPayment,
 				paymentModel.getCreateRentalModel().getCreateRentalCarRequest().getCustomerUserId(), rentalCar,
 				rentalCar.getTotalPrice());
 
-		addPayment(paymentModel.getCreatePaymentRequest(), invoice, rentalCar);
+		CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
+		addPayment(createPaymentRequest, invoice, rentalCar);
 	}
 
 	private RentalCar addRentalForCorporateCustomer(CreateRentalModel createRentalModel) {
@@ -230,9 +232,12 @@ public class PaymentManager implements PaymentService {
 
 		Double difference = rentalCar.getTotalPrice() - totalInvoicePrice;
 
-		Invoice invoice = addInvoiceForIndividual(payExtraModel.getCreateInvoiceRequest(),
-				rentalCar.getCustomer().getId(), rentalCar, difference);
-		addPayment(payExtraModel.getCreatePaymentRequest(), invoice, rentalCar);
+		CreateInvoiceRequestForPayment createInvoiceRequestForPayment = new CreateInvoiceRequestForPayment();
+		Invoice invoice = addInvoiceForIndividual(createInvoiceRequestForPayment, rentalCar.getCustomer().getId(),
+				rentalCar, difference);
+
+		CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
+		addPayment(createPaymentRequest, invoice, rentalCar);
 
 		if (!rentalCarService.checkIfIsRightTime(rentalCar)) {
 			rentalCar.setEndDate(LocalDate.now());
@@ -259,10 +264,12 @@ public class PaymentManager implements PaymentService {
 
 		Double difference = rentalCar.getTotalPrice() - totalInvoicePrice;
 
-		Invoice invoice = addInvoiceForCorporate(payExtraModel.getCreateInvoiceRequest(),
-				rentalCar.getCustomer().getId(), rentalCar, difference);
+		CreateInvoiceRequestForPayment createInvoiceRequestForPayment = new CreateInvoiceRequestForPayment();
+		Invoice invoice = addInvoiceForCorporate(createInvoiceRequestForPayment, rentalCar.getCustomer().getId(),
+				rentalCar, difference);
 
-		addPayment(payExtraModel.getCreatePaymentRequest(), invoice, rentalCar);
+		CreatePaymentRequest createPaymentRequest = new CreatePaymentRequest();
+		addPayment(createPaymentRequest, invoice, rentalCar);
 
 		if (!rentalCarService.checkIfIsRightTime(rentalCar)) {
 			rentalCar.setEndDate(LocalDate.now());
