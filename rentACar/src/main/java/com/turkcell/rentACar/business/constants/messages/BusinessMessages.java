@@ -109,4 +109,16 @@ public class BusinessMessages {
 	public static final String CAR_CANNOT_RENT_BECAUSE_MAINTENANCE = " This car cannot be rented as it is under maintenance.";
 	public static final String RENTAL_CAR_CANNOT_BEACUSE_MAINTENANCE_OR_NULL_DATE = "This car cannot be rented beacuse it is under maintenance or return date equals null.";
 
+	public static final String ROLE_SAVE_SUCCESSFULLY = "Role saved successfully.";
+	public static final String ROLE_GET_SUCCESSFULLY = "Role get successfully.";
+	public static final String ROLE_NOT_FOUND = "Role not found.";
+	public static final String ADD_ROLE_TO_USER_SUCCESSFULLY = "Add role to user successfully.";
+	public static final String DELETE_ROLE_FROM_USER_SUCCESSFULLY = "Delete role from user successfully.";
+
+	public static final String USER_NOT_FOUND = "User not found.";
+	public static final String USER_GET_SUCCESSFULLY = "User get successfully";
+	public static final String USER_LIST_SUCCESSFULLY = "User list successfully.";
+
+	public static final String REFRESH_TOKEN_IS_MISSING = "Refresh token is missing!";
+
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACar.business.abstracts.IndividualCustomerService;
@@ -25,13 +26,15 @@ import com.turkcell.rentACar.entities.concretes.IndividualCustomer;
 public class IndividualCustomerManager implements IndividualCustomerService {
 	private IndividualCustomerDao individualCustomerDao;
 	private ModelMapperService modelMapperService;
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao,
-			ModelMapperService modelMapperService) {
+	public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService,
+			PasswordEncoder passwordEncoder) {
 		super();
 		this.individualCustomerDao = individualCustomerDao;
 		this.modelMapperService = modelMapperService;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -39,6 +42,8 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
 		IndividualCustomer individualCustomer = this.modelMapperService.forRequest()
 				.map(createIndividualCustomerRequest, IndividualCustomer.class);
+
+		individualCustomer.setPassword(passwordEncoder.encode(individualCustomer.getPassword()));
 
 		individualCustomerDao.save(individualCustomer);
 
