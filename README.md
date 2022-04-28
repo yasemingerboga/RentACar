@@ -1,4 +1,5 @@
 # RentACar
+## How it works?
 <br/>
 Firstly, you should add new account. You can use IndividualCustomer add or CorporateCustomer add methods.
 
