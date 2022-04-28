@@ -24,6 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final UserDetailsService userDetailsService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	private static final String[] AUTH_WHITELIST = { "/v3/api-docs/**", "/swagger-ui/**" };
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -43,6 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**").permitAll();
+		http.authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll();
 
 		http.authorizeRequests().antMatchers("GET", "/api/user/**").hasAnyAuthority("ROLE_ADMIN");
 		http.authorizeRequests().antMatchers("GET", "/api/rentalCars/**").hasAnyAuthority("ROLE_USER");
@@ -50,6 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("POST", "/api/rentalCars/update/**").hasAnyAuthority("ROLE_ADMIN");
 
 		http.authorizeRequests().anyRequest().authenticated();
+
 		http.addFilter(customAuthenticationFilter);
 
 		http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
