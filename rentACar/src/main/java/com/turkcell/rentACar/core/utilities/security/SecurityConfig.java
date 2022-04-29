@@ -1,5 +1,6 @@
 package com.turkcell.rentACar.core.utilities.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final UserDetailsService userDetailsService;
+	@Autowired
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private static final String[] AUTH_WHITELIST = { "/v3/api-docs/**", "/swagger-ui/**" };
 
@@ -43,7 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-		http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**").permitAll();
+		http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**", "/api/individualCustomers/**",
+				"/api/corporateCustomers/**").permitAll();
 		http.authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll();
 
 		http.authorizeRequests().antMatchers("GET", "/api/user/**").hasAnyAuthority("ROLE_ADMIN");

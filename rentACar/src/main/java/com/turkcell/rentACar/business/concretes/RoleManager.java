@@ -38,7 +38,8 @@ public class RoleManager implements RoleService {
 	@Override
 	public DataResult<Role> getRoleById(int id) {
 		checkIfRoleExistsById(id);
-		return new SuccessDataResult<Role>(roleDao.getById(id), BusinessMessages.ROLE_GET_SUCCESSFULLY);
+		Role role = roleDao.findById(id);
+		return new SuccessDataResult<Role>(role, BusinessMessages.ROLE_GET_SUCCESSFULLY);
 	}
 
 	@Override

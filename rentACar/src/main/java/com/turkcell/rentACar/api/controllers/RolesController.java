@@ -32,7 +32,7 @@ public class RolesController {
 		return ResponseEntity.created(uri).body(roleService.saveRole(role));
 	}
 
-	@GetMapping("/getRoleById")
+	@GetMapping("/getRoleById/{id}")
 	public DataResult<Role> getRoleById(@RequestParam int id) {
 		return roleService.getRoleById(id);
 	}
