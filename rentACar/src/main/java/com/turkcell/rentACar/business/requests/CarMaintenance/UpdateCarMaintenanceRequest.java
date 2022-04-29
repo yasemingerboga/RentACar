@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,14 +16,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateCarMaintenanceRequest {
 
-	@NotNull
-	@Min(1)
-	@NotBlank
+	@Positive
 	private int carMaintenanceId;
 	private String description;
 	@NotNull
 	private LocalDate returnDate;
-	@NotNull
-	@Min(1)
+	@Positive
 	private int carId;
 }

@@ -374,6 +374,10 @@ public class RentalCarManager implements RentalCarService {
 			totalInvoicePrice += invoice.getTotalPrice();
 		}
 		Double difference = 0.0;
+		if (!checkIfRentStarts(rentalCar)) {
+			return new ErrorResult(BusinessMessages.RENT_NOT_STARTED);
+		}
+
 		if (!checkIfIsRightTime(rentalCar)) {
 			difference = calculateTotalPrice(rentalCar.getCar().getId(),
 					calculateTotalRentDay(rentalCar.getStartingDate(), LocalDate.now()), rentalCar.getAdditionalPrice())
@@ -410,6 +414,13 @@ public class RentalCarManager implements RentalCarService {
 	public boolean checkIfIsRightTime(RentalCar rentalCar) {
 
 		if (!rentalCar.getEndDate().equals(LocalDate.now())) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean checkIfRentStarts(RentalCar rentalCar) {
+		if (rentalCar.getStartingDate().isAfter(LocalDate.now())) {
 			return false;
 		}
 		return true;

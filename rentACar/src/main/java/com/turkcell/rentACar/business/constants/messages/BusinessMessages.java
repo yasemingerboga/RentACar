@@ -108,6 +108,7 @@ public class BusinessMessages {
 	public static final String RENTED_ALREADY = "This car is rented already.";
 	public static final String CAR_CANNOT_RENT_BECAUSE_MAINTENANCE = " This car cannot be rented as it is under maintenance.";
 	public static final String RENTAL_CAR_CANNOT_BEACUSE_MAINTENANCE_OR_NULL_DATE = "This car cannot be rented beacuse it is under maintenance or return date equals null.";
+	public static final String RENT_NOT_STARTED = "Rent has not started yet!";
 
 	public static final String ROLE_SAVE_SUCCESSFULLY = "Role saved successfully.";
 	public static final String ROLE_GET_SUCCESSFULLY = "Role get successfully.";

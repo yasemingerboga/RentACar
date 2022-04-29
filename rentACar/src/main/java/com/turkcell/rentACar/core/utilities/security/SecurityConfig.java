@@ -16,16 +16,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.turkcell.rentACar.core.utilities.filter.CustomAuthenticationFilter;
 import com.turkcell.rentACar.core.utilities.filter.CustomAuthorizationFilter;
 
-import lombok.RequiredArgsConstructor;
-
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private final UserDetailsService userDetailsService;
+	private UserDetailsService userDetailsService;
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+
 	@Autowired
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	public SecurityConfig(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+		super();
+		this.userDetailsService = userDetailsService;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+	}
+
 	private static final String[] AUTH_WHITELIST = { "/v3/api-docs/**", "/swagger-ui/**" };
 
 	@Override
