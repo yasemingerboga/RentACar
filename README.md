@@ -9,7 +9,8 @@ After that, go to Postman and send the Post request for login the application.
 <br/>
 ![image](https://user-images.githubusercontent.com/68692720/165785710-5a2b00f7-277c-4ba5-85db-f284b8370811.png)
 <br/><br/><br/>
-You can see access_token and refresh_token. Copy the access_token.
+You can see access_token and refresh_token. Copy the access_token. Or you can use this token: 
+* eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoZXJva3VAZGVuZW1lLmNvbSIsInJvbGVzIjpbXSwiaXNzIjoiL2FwaS9sb2dpbiIsImV4cCI6OTk5OTk5OTk5OX0._ZLavBl5bO9ccc8apM2kqgOfzHxEIFHnUo6dylXyOB0
 <br/><br/><br/>
 Then, click Authorize button in Swagger UI.
 <br/>
